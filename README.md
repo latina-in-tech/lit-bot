@@ -123,6 +123,11 @@ Once the Docker image has been built, you can proceed with creating and running 
 docker container run --interactive --detach --name lit-bot-container lit-bot-image
 ```
 
+You can also use Docker Compose to build and run the application stack, using the command:
+```console
+docker compose up --detach
+```
+
 Once the Docker container is created and is running, the application is ready to be used.
 
 [Go to index ↑](#index)
