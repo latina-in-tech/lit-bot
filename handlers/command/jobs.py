@@ -1,6 +1,5 @@
 from dependencies.db import Session, get_db
 from models.job.job import Job
-from datetime import datetime
 from sqlalchemy import Select, ScalarResult, select, and_
 from telegram import Update
 from telegram.ext import ContextTypes
