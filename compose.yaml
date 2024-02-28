@@ -1,0 +1,9 @@
+version: "3"
+services:
+  lit-bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: lit-bot-image
+    env_file:
+      - ".env"
