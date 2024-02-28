@@ -42,7 +42,7 @@ Then, you can choose to install the application in two ways:
 - using Docker containers
 
 If you want to install the application on your PC, then keep following this guide;<br>
-otherwise, jump directly to the setup guide [using Docker containers.]()
+otherwise, jump directly to the setup guide [using Docker containers.](#setup-using-docker-containers)
 
 ### Setup on your PC
 
