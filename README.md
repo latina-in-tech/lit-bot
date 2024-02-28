@@ -72,7 +72,11 @@ pip install -r requirements.txt
 Once the application dependencies are installed, you can proceed with seeding the SQLite database, using the command:
 python .\seeder.py
 
-Once the SQLite database has been seeded, the application is ready to be used.
+Once the SQLite database has been seeded, the application is ready to be used, running the command:
+
+```console
+python .
+```
 
 [Go to index ↑](#index)
 
