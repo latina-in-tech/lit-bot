@@ -12,8 +12,8 @@ COMMANDS_LIST: dict = {
 
 async def cmds(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
+    # Compose the text to show to the user
     text: str = '<b>Lista dei comandi disponibili:</b>\n'
-    print([f'{k} - {v}' for k,v in COMMANDS_LIST.items()])
     text += '\n'.join([f'{k} - {v}' for k,v in COMMANDS_LIST.items()])
 
     await context.bot.send_message(chat_id=update.effective_chat.id, text=text, parse_mode=ParseMode.HTML)
