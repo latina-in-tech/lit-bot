@@ -21,11 +21,14 @@ Visualizza la lista dei lavori proposti dai membri della community.
 
 async def jobs(update: Update, context: ContextTypes.DEFAULT_TYPE, db_session: Session = get_db()):
 
-    # If the first context argument is "help"
-    if context.args[0] == 'help':
-        await update.message.reply_text(text=HELP_MESSAGE, parse_mode=ParseMode.HTML)
+    # If there is any argument in the context
+    if len(context.args) > 0:
+    
+        # If the first context argument is "help"
+        if context.args[0] == 'help':
+            await update.message.reply_text(text=HELP_MESSAGE, parse_mode=ParseMode.HTML)
 
-        return
+            return
 
     # Variables initialization
     query_parameters: dict = {}
