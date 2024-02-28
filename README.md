@@ -89,7 +89,10 @@ SA_DB_FILEPATH=db.sqlite
 ``` 
 
 Once the .env file has been created, and the variables have been correctly valued, you can proceed with seeding the SQLite database, using the command:
+
+```console
 python .\seeder.py
+```
 
 Once the SQLite database has been seeded, the application is ready to be used, running the command:
 
