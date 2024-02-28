@@ -1,9 +1,12 @@
 version: "3"
 services:
   lit-bot:
+    container_name: 'lit-bot-container'
     build:
       context: .
       dockerfile: Dockerfile
     image: lit-bot-image
     env_file:
       - ".env"
+    restart: always
+    
