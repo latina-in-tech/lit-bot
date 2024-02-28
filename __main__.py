@@ -4,6 +4,7 @@ from telegram.ext import ApplicationBuilder, CommandHandler, ConversationHandler
 from handlers.command.start import start
 from handlers.command.events import events
 from handlers.command.jobs import jobs
+from handlers.command.cmds import cmds
 from handlers.message.unknown import unknown
 import logging
 from telegram.ext import filters
@@ -30,6 +31,9 @@ if __name__ == '__main__':
 
     jobs_handler = CommandHandler('jobs', jobs)
     application.add_handler(jobs_handler)
+    
+    cmds_handler = CommandHandler('cmds', cmds)
+    application.add_handler(cmds_handler)
     
     unknown_handler = MessageHandler(filters.COMMAND, unknown)
     application.add_handler(unknown_handler)
