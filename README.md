@@ -33,7 +33,12 @@ The libraries used by Python are:
 - SQLAlchemy-Utils
 
 ## Setup
-First, you need to have Python, SQLite and Git installed on your operating system.<br>
+
+### Prerequisites
+To use the bot, you need to have a Telegram API token, which can be obtained by following the [official guide](https://core.telegram.org/bots/tutorial#introduction).
+
+
+Then, you need to have Python, SQLite and Git installed on your operating system.<br>
 Once this point has been established, we can move on to the phase of creating the Python virtual environment, within which all the dependencies necessary for the correct functioning of the application will be installed.
 
 To proceed with completing this step, you must have the `virtualenv` module installed.<br>
@@ -69,7 +74,21 @@ Once venv is activated, you can proceed with installing the application dependen
 pip install -r requirements.txt
 ```
 
-Once the application dependencies are installed, you can proceed with seeding the SQLite database, using the command:
+    
+
+Once the application dependencies are installed, you can proceed with the creation of the `.env` file in the root folder, within which it is necessary to specify a series of environment variables for the correct functioning of the application.<br>
+The variables are:
+
+
+```console
+BOT_TOKEN=<api_token>
+
+SA_DB_DIALECT=sqlite
+SA_DB_DRIVER=pysqlite
+SA_DB_FILEPATH=db.sqlite
+``` 
+
+Once the .env file has been created, and the variables have been correctly valued, you can proceed with seeding the SQLite database, using the command:
 python .\seeder.py
 
 Once the SQLite database has been seeded, the application is ready to be used, running the command:
