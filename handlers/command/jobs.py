@@ -6,19 +6,24 @@ from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ParseMode
 
-HELP_MESSAGE: str = '''\U00002753 Utilizzo del comando /jobs.\n
+
+HELP_MESSAGE: str = '''\U00002753 <b>Guida all'utilizzo del comando /jobs</b>
+Visualizza la lista dei lavori proposti dai membri della community.
+
 \U0001F4DD Parametri (opzionali):
-- contract_type_id (int): 1-3 
-- category_id (int): 1-3
+- <i>contract_type_id</i> (int): 1-3 
+- <i>category_id</i> (int): 1-3
 
 \U000025B6 Utilizzo dei parametri:
-/jobs contract_type_id=1 category_id=2 
+/jobs contract_type_id=1 category_id=2
 '''
+
 
 async def jobs(update: Update, context: ContextTypes.DEFAULT_TYPE, db_session: Session = get_db()):
 
+    # If the first context argument is "help"
     if context.args[0] == 'help':
-        await update.message.reply_text(text=HELP_MESSAGE)
+        await update.message.reply_text(text=HELP_MESSAGE, parse_mode=ParseMode.HTML)
 
         return
 

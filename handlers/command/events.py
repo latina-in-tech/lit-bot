@@ -7,8 +7,19 @@ from telegram.ext import ContextTypes
 from telegram.constants import ParseMode
 
 
+HELP_MESSAGE: str = '''\U00002753 <b>Guida all'utilizzo del comando /events</b>
+Visualizza la lista degli eventi della community in programma.
+'''
+
+
 async def events(update: Update, context: ContextTypes.DEFAULT_TYPE, db_session: Session = get_db()):
 
+    # If the first context argument is "help"
+    if context.args[0] == 'help':
+        await update.message.reply_text(text=HELP_MESSAGE, parse_mode=ParseMode.HTML)
+
+        return
+    
     # Variables initialization
     events_count: int = 0
     text: str = ''

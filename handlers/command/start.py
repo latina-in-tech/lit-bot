@@ -7,6 +7,7 @@ START_MESSAGE: str = 'Ciao {user_full_name}! \U0001F44B\n' + \
                      'Utilizza il comando /cmds per vedere cosa posso fare.\n' + \
                      'Per ulteriori informazioni, rivolgiti pure a un admin del gruppo \U0001F60A'
 
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     global START_MESSAGE
