@@ -6,7 +6,21 @@ from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ParseMode
 
+HELP_MESSAGE: str = '''\U00002753 Utilizzo del comando /jobs.\n
+\U0001F4DD Parametri (opzionali):
+- contract_type_id (int): 1-3 
+- category_id (int): 1-3
+
+\U000025B6 Utilizzo dei parametri:
+/jobs contract_type_id=1 category_id=2 
+'''
+
 async def jobs(update: Update, context: ContextTypes.DEFAULT_TYPE, db_session: Session = get_db()):
+
+    if context.args[0] == 'help':
+        await update.message.reply_text(text=HELP_MESSAGE)
+
+        return
 
     # Variables initialization
     query_parameters: dict = {}
