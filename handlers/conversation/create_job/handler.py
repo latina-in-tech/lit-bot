@@ -1,4 +1,4 @@
-from dependencies.db import Session, get_db
+from dependencies.db import SessionLocal
 from models.job.job import Job
 from models.job_category.job_category import JobCategory
 from models.contract_type.contract_type import ContractType
@@ -22,38 +22,37 @@ class CreateJob(Enum):
 # Initialize an empty dict for the new job's data
 job_data: dict = {}
 
-# Get the db session to populate keyboards and patterns
-db_session: Session = get_db()
+with SessionLocal() as db_session:
 
-# Get contract types
-sql_statement: Select = select(ContractType.name) \
-                        .order_by(ContractType.name)
-    
-query_result: Result = db_session.execute(sql_statement).all()
+    # Get contract types
+    sql_statement: Select = select(ContractType.name) \
+                            .order_by(ContractType.name)
+        
+    query_result: Result = db_session.execute(sql_statement).all()
 
-if query_result:
-    contract_types: list = [record[0] for record in query_result] 
+    if query_result:
+        contract_types: list = [record[0] for record in query_result] 
 
-    # Keyboard
-    contract_types_reply_keyboard: list = [contract_types]
-    
-    # Filter pattern
-    contract_types_filter_pattern: str = f'^({'|'.join(contract_types)})$'
+        # Keyboard
+        contract_types_reply_keyboard: list = [contract_types]
+        
+        # Filter pattern
+        contract_types_filter_pattern: str = f'^({'|'.join(contract_types)})$'
 
-# Get job categories
-sql_statement: Select = select(JobCategory.name) \
-                        .order_by(JobCategory.name)
+    # Get job categories
+    sql_statement: Select = select(JobCategory.name) \
+                            .order_by(JobCategory.name)
 
-query_result: Result = db_session.execute(sql_statement).all()
+    query_result: Result = db_session.execute(sql_statement).all()
 
-if query_result:
-    job_categories: list = [record[0] for record in query_result] 
+    if query_result:
+        job_categories: list = [record[0] for record in query_result] 
 
-    # Keyboard
-    job_categories_reply_keyboard = [job_categories]
-    
-    # Filter pattern
-    category_ids_filter_pattern = f'^({'|'.join(job_categories)})$'
+        # Keyboard
+        job_categories_reply_keyboard = [job_categories]
+        
+        # Filter pattern
+        category_ids_filter_pattern = f'^({'|'.join(job_categories)})$'
 
 
 async def create_job(update: Update, context: ContextTypes.DEFAULT_TYPE):  
@@ -190,34 +189,38 @@ async def validate_ral(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return CreateJob.RAL
 
 
-async def normalize_job(job_data: dict, db_session: Session = get_db()):
+async def normalize_job(job_data: dict):
 
-    # Get the respective contract_type_id by its name
-    sql_statement: Select = select(ContractType.id).where(ContractType.name == job_data['contract_type_id'])
-    contract_type_id: int = db_session.scalar(sql_statement)
-    
-    # Update the job_data dictionary
-    job_data['contract_type_id'] = contract_type_id
-    
-    # Get the respective category_id by its name
-    sql_statement: Select = select(JobCategory.id).where(JobCategory.name == job_data['category_id'])
-    category_id: int = db_session.scalar(sql_statement)
-    
-    # Update the job_data dictionary
-    job_data['category_id'] = category_id
+    # Initialize the db_session
+    # It closes automatically at the end of the "with" context manager
+    with SessionLocal() as db_session:
 
-    # Create the new job
-    job: Job = Job(**job_data)
+        # Get the respective contract_type_id by its name
+        sql_statement: Select = select(ContractType.id).where(ContractType.name == job_data['contract_type_id'])
+        contract_type_id: int = db_session.scalar(sql_statement)
+        
+        # Update the job_data dictionary
+        job_data['contract_type_id'] = contract_type_id
+        
+        # Get the respective category_id by its name
+        sql_statement: Select = select(JobCategory.id).where(JobCategory.name == job_data['category_id'])
+        category_id: int = db_session.scalar(sql_statement)
+        
+        # Update the job_data dictionary
+        job_data['category_id'] = category_id
 
-    # Add the job to the session
-    db_session.add(job)
-    
-    # If the job has correctly added to the session
-    if job in db_session:
-        db_session.commit()
-        return True
-    
-    return False
+        # Create the new job
+        job: Job = Job(**job_data)
+
+        # Add the job to the session
+        db_session.add(job)
+        
+        # If the job has correctly added to the session
+        if job in db_session:
+            db_session.commit()
+            return True
+        
+        return False
 
 
 async def ral(update: Update, context: ContextTypes.DEFAULT_TYPE):

@@ -16,11 +16,6 @@ force_instant_defaults()
 Base.metadata.create_all(bind=db_engine)
 
 
-def get_db():
+def get_db() -> Session:
     
-    db_session: Session = SessionLocal()
-    
-    try:
-        return db_session
-    finally:
-        db_session.close()
+    return SessionLocal()

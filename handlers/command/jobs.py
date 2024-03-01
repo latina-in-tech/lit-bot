@@ -1,4 +1,4 @@
-from dependencies.db import Session, get_db
+from dependencies.db import SessionLocal
 from models.job.job import Job
 from sqlalchemy import Select, ScalarResult, select, and_
 from telegram import Update
@@ -18,7 +18,7 @@ Visualizza la lista dei lavori proposti dai membri della community.
 '''
 
 
-async def jobs(update: Update, context: ContextTypes.DEFAULT_TYPE, db_session: Session = get_db()):
+async def jobs(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # If there is any argument in the context
     if len(context.args) > 0:
@@ -51,36 +51,40 @@ async def jobs(update: Update, context: ContextTypes.DEFAULT_TYPE, db_session: S
     # Get the query parameters (if they are present)
     category_id: int | None = int(query_parameters.get('category_id', 0))
     contract_type: int | None = int(query_parameters.get('contract_type_id', 0))
-    
-    # Select statement for the jobs' list
-    select_statement: Select = select(Job) \
-                               .where(
-                                   and_(
-                                       True if not category_id else Job.category_id == category_id,
-                                       True if not contract_type else Job.contract_type_id == contract_type,
-                                       Job.deleted_at.is_(None),
-                                       )
-                                ) \
-                               .order_by(Job.created_at)
-    
-    # Execute the query and get the result
-    query_result: ScalarResult = db_session.scalars(select_statement).all()
 
-    # If the query returned some data
-    if query_result:
+    # Initialize the db_session
+    # It closes automatically at the end of the "with" context manager
+    with SessionLocal() as db_session:
+    
+        # Select statement for the jobs' list
+        select_statement: Select = select(Job) \
+                                .where(
+                                    and_(
+                                        True if not category_id else Job.category_id == category_id,
+                                        True if not contract_type else Job.contract_type_id == contract_type,
+                                        Job.deleted_at.is_(None),
+                                        )
+                                    ) \
+                                .order_by(Job.created_at)
         
-        # Get the records' count
-        jobs_count = len(query_result)
+        # Execute the query and get the result
+        query_result: ScalarResult = db_session.scalars(select_statement).all()
 
-        # Set the text to display to the user
-        text = f'\U000025b6 Numero totale di lavori: {jobs_count} - Parametri ({query_parameters}):\n'
+        # If the query returned some data
+        if query_result:
+            
+            # Get the records' count
+            jobs_count = len(query_result)
 
-        # Compose the list of jobs
-        for i, job in enumerate(query_result):
-            text += f'{i + 1}. <a href="{job.link}">{job.position}</a> - ' \
-                    f'{job.job_category.name}\n'
-                
-        # Send the message to the user
-        await context.bot.send_message(chat_id=update.effective_chat.id, text=text, parse_mode=ParseMode.HTML)
-    else:
-        await context.bot.send_message(chat_id=update.effective_chat.id, text='Nessun lavoro trovato!')
+            # Set the text to display to the user
+            text = f'\U000025b6 Numero totale di lavori: {jobs_count} - Parametri ({query_parameters}):\n'
+
+            # Compose the list of jobs
+            for i, job in enumerate(query_result):
+                text += f'{i + 1}. <a href="{job.link}">{job.position}</a> - ' \
+                        f'{job.job_category.name}\n'
+                    
+            # Send the message to the user
+            await context.bot.send_message(chat_id=update.effective_chat.id, text=text, parse_mode=ParseMode.HTML)
+        else:
+            await context.bot.send_message(chat_id=update.effective_chat.id, text='Nessun lavoro trovato!')
