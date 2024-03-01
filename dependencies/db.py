@@ -14,8 +14,3 @@ db_engine: Engine = create_engine(DB_URL, echo=True)
 SessionLocal = sessionmaker(bind=db_engine)
 force_instant_defaults()
 Base.metadata.create_all(bind=db_engine)
-
-
-def get_db() -> Session:
-    
-    return SessionLocal()
