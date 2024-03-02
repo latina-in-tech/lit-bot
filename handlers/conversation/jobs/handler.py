@@ -2,34 +2,28 @@ from dependencies.db import SessionLocal
 from models.job.job import Job
 from sqlalchemy import Result, ScalarResult, Select, select
 from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
-from telegram.ext import CallbackQueryHandler, CommandHandler, ContextTypes, ConversationHandler
+from telegram.ext import CallbackQueryHandler, CommandHandler, ContextTypes, ConversationHandler, MessageHandler, filters
 from telegram.constants import ParseMode
 from re import findall
 from sqlalchemy import func
 from models.job_category.job_category import JobCategory
+from itertools import batched
 
 
 HELP_MESSAGE: str = '''\U00002753 <b>Guida all'utilizzo del comando /jobs</b>
 Visualizza la lista dei lavori proposti dai membri della community,
-suddivisi per categoria.
-'''
+suddivisi per categoria.'''
 
 JOB_CATEGORY, GO_BACK = range(2)
 JOB_CATEGORY_PATTERN: str = r'(.*)\s\(\d+\)'
 
 
-def create_inline_keyboard(num_columns: int, items: list) -> list[list[InlineKeyboardButton]]:
+def create_inline_keyboard(num_columns: int, items: list) -> InlineKeyboardMarkup:
+        
+    keyboard: list = [
+        [InlineKeyboardButton(text=item, callback_data=item) for item in list(batch)] 
+        for batch in batched(iterable=items, n=num_columns)]
     
-    row: list = []
-    keyboard: list[list] = []
-
-    for i, item in enumerate(items):
-        row.append(InlineKeyboardButton(text=item, callback_data=item))
-        if (i > 0) and (i % (num_columns - 1) == 0):
-
-            keyboard.append(row.copy())
-            row.clear()
-
     keyboard.append(
         [
             InlineKeyboardButton(text='Chiudi \U0000274C', 
@@ -70,6 +64,9 @@ def get_job_categories_inline_keyboard():
 
 async def jobs(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
+    # Delete the user typed command
+    await update.message.delete()
+    
     # If there is any argument in the context
     if len(context.args) > 0:
     
@@ -105,7 +102,7 @@ async def jobs(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             # Set the text to display to the user
             text = f'\U000025b6 Numero totale di lavori: {jobs_count}\n' + \
-                   'Clicca su una categoria per filtrare la lista dei lavori.\n'
+                   'Clicca su una categoria per visualizzare la lista dei lavori.\n'
         
             # Send the message to the user
             await update.message.reply_text(text=text, 
@@ -128,7 +125,7 @@ async def handle_job_category(update: Update, context: ContextTypes.DEFAULT_TYPE
 
     callback_data = query.data
     job_category_name: str = findall(pattern=JOB_CATEGORY_PATTERN, string=callback_data)[0]
-    text = f'Lista di lavori per la categoria "<i>{job_category_name}</i>"\n'
+    text = f'Lista di lavori per la categoria "<i>{job_category_name}</i>":\n'
 
     with SessionLocal() as db_session:
     
@@ -208,12 +205,21 @@ async def close_inline_keyboard(update: Update, context: ContextTypes.DEFAULT_TY
     query: CallbackQuery = update.callback_query
     query.answer()
 
-    keyboard = InlineKeyboardMarkup([[]])
-
-    await query.edit_message_text(text='Grazie!', reply_markup=keyboard)
     await query.delete_message()
 
     return ConversationHandler.END
+
+
+async def handle_unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    
+    keyboard = InlineKeyboardMarkup([[]])
+
+    await update.message.reply_text(text='Scelta non valida!', reply_markup=keyboard)
+
+    update.message.delete()
+    
+    return ConversationHandler.END
+
 
 jobs_handler = {
     'entry_points': [
@@ -229,6 +235,7 @@ jobs_handler = {
         ]
     },
     'fallbacks': [
-        CallbackQueryHandler(close_inline_keyboard, pattern='^close_inline_keyboard$')
-    ]
+        CallbackQueryHandler(close_inline_keyboard, pattern='^close_inline_keyboard$'),
+        MessageHandler(filters=filters.COMMAND | filters.TEXT, callback=handle_unknown),
+        ]
 }

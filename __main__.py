@@ -4,7 +4,6 @@ from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ConversationHandler, MessageHandler, filters
 from handlers.command.start import start
 from handlers.command.events import events
-# from handlers.command.jobs import jobs
 from handlers.conversation.jobs.handler import jobs_handler
 from handlers.command.cmds import cmds
 from handlers.conversation.create_job.handler import create_job_handler

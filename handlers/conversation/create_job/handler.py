@@ -7,21 +7,11 @@ from sqlalchemy import Select, select, Result
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
 from telegram.constants import ParseMode
 from telegram.ext import ContextTypes, CommandHandler, ConversationHandler, filters, MessageHandler
+from itertools import batched
 
 
 def create_keyboard(num_columns: int, items: list) -> list[list]:
-    
-    row: list = []
-    keyboard: list[list] = []
-
-    for i, item in enumerate(items):
-        row.append(item)
-        if (i > 0) and (i % (num_columns - 1) == 0):
-
-            keyboard.append(row.copy())
-            row.clear()
-
-    return keyboard
+    return [list(batch) for batch in batched(iterable=items, n=num_columns)]
 
 
 # CreateJob Enum for the ConversationHandler steps
@@ -50,7 +40,7 @@ with SessionLocal() as db_session:
         # Keyboard
         # Each row is a list, and each button is an item
         # On each row there are four buttons
-        contract_types_reply_keyboard: list = create_keyboard(num_columns=4, items=contract_types)
+        contract_types_reply_keyboard: list = create_keyboard(num_columns=3, items=contract_types)
         
         # Filter pattern
         contract_types_filter_pattern: str = f'^({'|'.join(contract_types)})$'
@@ -65,7 +55,7 @@ with SessionLocal() as db_session:
         job_categories: list = [record[0] for record in query_result] 
 
         # Keyboard
-        job_categories_reply_keyboard = create_keyboard(num_columns=4, items=job_categories)
+        job_categories_reply_keyboard = create_keyboard(num_columns=2, items=job_categories)
         
         # Filter pattern
         category_ids_filter_pattern = f'^({'|'.join(job_categories)})$'
@@ -176,8 +166,9 @@ async def description(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Set the job's description
     job_data['description'] = user_message
     
-    await update.message.reply_text('Inserisci il link dell\'offerta \U0001F310 \n' + \
-                                    '<i>Se non applicabile: n.a.</i>')
+    await update.message.reply_text(text='Inserisci il link dell\'offerta \U0001F310 \n' + \
+                                         '<i>Se non applicabile: n.a.</i>', 
+                                    parse_mode=ParseMode.HTML)
     
     return CreateJob.LINK
 
@@ -188,10 +179,11 @@ async def link(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_message: str = update.message.text
     
     # Set the job's link
-    job_data['link'] = user_message
+    job_data['link'] = user_message if user_message != 'n.a.' else None
     
-    await update.message.reply_text(text='Inserisci la RAL del lavoro \U0001F4B2 \n' + \
-                                    '<i>Esempio: 50000</i>',
+    await update.message.reply_text(text='Inserisci il RAL del lavoro \U0001F4B2\n' + \
+                                    '<i>Esempio: 50000</i>\n' + \
+                                    '<i>Se non applicabile: n.a.</i>',
                                     parse_mode=ParseMode.HTML)
     
     return CreateJob.RAL
@@ -201,7 +193,7 @@ async def validate_ral(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     await update.message.reply_text('Attenzione! \U000026A0\n' + \
                                     'La RAL inserita non e\' valida.\n' + \
-                                    'Inserisci la RAL del lavoro:')
+                                    'Inserisci il RAL del lavoro:')
     
     return CreateJob.RAL
 
@@ -246,7 +238,7 @@ async def ral(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_message: str = update.message.text
 
     # Set the job's link and created_by (id of the user)
-    job_data['ral'] = user_message
+    job_data['ral'] = user_message if user_message != 'n.a.' else None
     job_data['created_by'] = update.message.from_user.id
 
     # Normalization of the data (contract_type_id and category_id strings (column "name") become ids)
@@ -267,7 +259,7 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # Set the filter for the message handlers,
 # in order to filter the messages and choose the correct callback
 TEXT_FILTER_WITH_CANCEL_COMMAND = filters.TEXT & \
-                                  ~filters.Regex(pattern='^\/cancel$')
+                                  ~filters.Regex(pattern=r'^\/cancel$')
 
 # Create the job handler
 create_job_handler: dict = {
@@ -307,12 +299,12 @@ create_job_handler: dict = {
                 callback=link)],
         CreateJob.RAL: [
             MessageHandler(
-                filters=filters.Regex('^\d+$') & ~filters.Regex(pattern='^\/cancel$'), 
+                filters=(filters.Regex(r'^\d+$') | filters.Regex(r'^n\.a\.$')) & ~filters.Regex(pattern=r'^\/cancel$'), 
                 callback=ral),
             MessageHandler(
                 filters=TEXT_FILTER_WITH_CANCEL_COMMAND,
                 callback=validate_ral)]
     },
     # Here is where the ConversationHandler goes when all the filters didn't pass the check
-    'fallbacks': [CommandHandler("cancel", cancel)]
+    'fallbacks': [CommandHandler('cancel', cancel)]
 }
