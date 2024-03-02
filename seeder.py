@@ -1,66 +1,38 @@
 from models.contract_type.contract_type import ContractType
-from models.event.event import Event
-from models.job.job import Job
 from models.job_category.job_category import JobCategory
-from datetime import datetime
-from random import randint
-from dependencies.db import get_db
+from dependencies.db import SessionLocal
 
-CONTRACT_TYPES: list[dict] = [
-    {'name': 'determinato'},
-    {'name':'indeterminato'},
-    {'name':'progetto'},
+
+CONTRACT_TYPES: list = [
+    'Determinato',
+    'Indeterminato',
+    'Apprendistato',
+    'Part-time',
+    'Progetto'
 ]
 
-JOB_CATEGORIES: list[dict] = [
-    {'name': 'DevOps'},
-    {'name': 'IT'},
-    {'name': 'Cloud'},
+JOB_CATEGORIES: list = [
+    'Back-end',
+    'Cybersecurity',
+    'DevOps & Cloud',
+    'Front-end',
+    'Machine Learning & AI',
+    'Mobile',
+    'Quantum Computing',
+    'UX-UI'
 ]
 
-EVENTS: list[dict] = []
 
-for i in range(1, 11):
+with SessionLocal() as db_session:
 
-    EVENTS.append({
-        'name': f'Test event #{i}',
-        'description': f'Test description event #{i}',
-        'date': datetime.now(),
-        'link': f'https://www.samplelink.com/event{i}',
-        'created_by': randint(1, 10000)
-    })
+    for item in CONTRACT_TYPES:
+        record: dict = {'name': item}
+        contract_type = ContractType(**record)
+        db_session.add(contract_type)
 
-JOBS: list[dict] = []
+    for item in JOB_CATEGORIES:
+        record: dict = {'name': item}
+        job_category = JobCategory(**record)
+        db_session.add(job_category)
 
-for i in range(1, 11):
-
-    JOBS.append({
-        'contract_type_id': randint(1, 3),
-        'category_id': randint(1, 3),
-        'position': f'Position #{i}',
-        'description': f'Test description job #{i}',
-        'link': f'https://www.samplelink.com/job{i}',
-        'ral': randint(20000, 50000),
-        'created_by': randint(1, 10000)
-    })
-
-
-db_session = get_db()
-
-for record in CONTRACT_TYPES:
-    contract_type = ContractType(**record)
-    db_session.add(contract_type)
-
-for record in JOB_CATEGORIES:
-    job_category = JobCategory(**record)
-    db_session.add(job_category)
-
-for record in EVENTS:
-    event = Event(**record)
-    db_session.add(event)
-
-for record in JOBS:
-    job = Job(**record)
-    db_session.add(job)
-
-db_session.commit()
+    db_session.commit()
