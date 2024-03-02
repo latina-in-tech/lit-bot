@@ -11,6 +11,6 @@ DB_URL: str = f'{ENV_VARS['SA_DB_DIALECT']}+{ENV_VARS['SA_DB_DRIVER']}:///{ENV_V
               
 
 db_engine: Engine = create_engine(DB_URL, echo=True)
-SessionLocal = sessionmaker(bind=db_engine)
+SessionLocal: Session = sessionmaker(bind=db_engine)
 force_instant_defaults()
 Base.metadata.create_all(bind=db_engine)
