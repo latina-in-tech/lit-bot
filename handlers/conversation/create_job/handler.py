@@ -9,6 +9,20 @@ from telegram.constants import ParseMode
 from telegram.ext import ContextTypes, CommandHandler, ConversationHandler, filters, MessageHandler
 
 
+def create_keyboard(num_columns: int, items: list) -> list[list]:
+    
+    row: list = []
+    keyboard: list[list] = []
+
+    for i, item in enumerate(items):
+        row.append(item)
+        if (i > 0) and (i % (num_columns - 1) == 0):
+
+            keyboard.append(row.copy())
+            row.clear()
+
+    return keyboard
+
 
 # CreateJob Enum for the ConversationHandler steps
 class CreateJob(Enum):
@@ -34,7 +48,9 @@ with SessionLocal() as db_session:
         contract_types: list = [record[0] for record in query_result] 
 
         # Keyboard
-        contract_types_reply_keyboard: list = [contract_types]
+        # Each row is a list, and each button is an item
+        # On each row there are four buttons
+        contract_types_reply_keyboard: list = create_keyboard(num_columns=4, items=contract_types)
         
         # Filter pattern
         contract_types_filter_pattern: str = f'^({'|'.join(contract_types)})$'
@@ -49,7 +65,7 @@ with SessionLocal() as db_session:
         job_categories: list = [record[0] for record in query_result] 
 
         # Keyboard
-        job_categories_reply_keyboard = [job_categories]
+        job_categories_reply_keyboard = create_keyboard(num_columns=4, items=job_categories)
         
         # Filter pattern
         category_ids_filter_pattern = f'^({'|'.join(job_categories)})$'
@@ -160,7 +176,8 @@ async def description(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Set the job's description
     job_data['description'] = user_message
     
-    await update.message.reply_text('Inserisci il link dell\'offerta \U0001F310')
+    await update.message.reply_text('Inserisci il link dell\'offerta \U0001F310 \n' + \
+                                    '<i>Se non applicabile: n.a.</i>')
     
     return CreateJob.LINK
 
