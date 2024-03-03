@@ -1,6 +1,8 @@
 from itertools import batched
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from typing import Iterable
+from telegram import CallbackQuery, Update
+from telegram.ext import ContextTypes, ConversationHandler
 
 
 def create_inline_keyboard(items: Iterable, 
@@ -21,6 +23,16 @@ def create_inline_keyboard(items: Iterable,
             ])
         
     return InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
+
+
+async def close_inline_keyboard(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    
+    query: CallbackQuery = update.callback_query
+    await query.answer()
+
+    await query.delete_message()
+
+    return ConversationHandler.END
 
 
 def create_reply_keyboard(items: Iterable, 
