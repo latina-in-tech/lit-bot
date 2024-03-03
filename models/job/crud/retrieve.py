@@ -21,7 +21,7 @@ async def retrieve_jobs() -> list[Job] | None:
         return query_result if query_result else None
     
 
-async def retrieve_job_categories() -> list[str]:
+async def retrieve_job_categories_with_jobs_count() -> list[str]:
 
     # Variables initialization
     job_categories: list = []
