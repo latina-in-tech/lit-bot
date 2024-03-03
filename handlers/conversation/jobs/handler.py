@@ -1,11 +1,12 @@
 from enum import Enum
 from models.job.job import Job
-from handlers.conversation.jobs.crud.retrieve import retrieve_job_categories, retrieve_jobs, retrieve_jobs_by_category
+from models.job.crud.retrieve import retrieve_job_categories_with_jobs_count, retrieve_jobs, retrieve_jobs_by_category
 from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 from telegram.ext import CallbackQueryHandler, CommandHandler, ContextTypes, ConversationHandler, MessageHandler, filters
 from telegram.constants import ParseMode
 from re import findall
 from utils.utils import close_inline_keyboard, create_inline_keyboard
+
 
 HELP_MESSAGE: str = '''\U00002753 <b>Guida all'utilizzo del comando /jobs</b>
 Visualizza la lista dei lavori proposti dai membri della community,
@@ -37,7 +38,7 @@ async def jobs(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     text: str = ''
 
     # Retrieving the list of job categories, with the count of jobs per category
-    job_categories: list = await retrieve_job_categories()
+    job_categories: list = await retrieve_job_categories_with_jobs_count()
 
     # Create the job categories inline keyboard
     job_categories_keyboard: InlineKeyboardMarkup = create_inline_keyboard(items=job_categories, num_columns=2)
@@ -106,7 +107,7 @@ async def go_back(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text: str = ''
 
     # Retrieving the list of job categories, with the count of jobs per category
-    job_categories: list = await retrieve_job_categories()
+    job_categories: list = await retrieve_job_categories_with_jobs_count()
 
     # Create the job categories inline keyboard
     job_categories_keyboard: InlineKeyboardMarkup = create_inline_keyboard(items=job_categories, num_columns=2)
