@@ -14,7 +14,7 @@ def create_inline_keyboard(items: Iterable,
         [InlineKeyboardButton(text=item, callback_data=item) for item in list(batch)] 
         for batch in batched(iterable=items, n=num_columns)]
     
-    # Add close button if specified
+    # Add close button if not specified differently
     if has_close_button:
         inline_keyboard.append(
             [
@@ -37,6 +37,16 @@ async def close_inline_keyboard(update: Update, context: ContextTypes.DEFAULT_TY
 
 def create_reply_keyboard(items: Iterable, 
                           num_columns: int, 
+                          input_field_placeholder: str,
                           has_close_button: bool = True) -> ReplyKeyboardMarkup:
     
-    pass
+    reply_markup_keyboard: list = [list(batch) for batch in batched(iterable=items, n=num_columns)]
+    
+    # Add close button if not specified differently
+    if has_close_button:
+        reply_markup_keyboard.append(['Chiudi \U0000274C'])
+
+    return ReplyKeyboardMarkup(keyboard=reply_markup_keyboard,
+                               resize_keyboard=True,
+                               one_time_keyboard=True,
+                               input_field_placeholder=input_field_placeholder)
