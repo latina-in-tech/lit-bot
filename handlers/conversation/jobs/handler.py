@@ -1,14 +1,11 @@
-from dependencies.db import SessionLocal
 from enum import Enum
 from models.job.job import Job
-from models.job_category.job_category import JobCategory
-from itertools import batched
+from handlers.conversation.jobs.crud.retrieve import retrieve_job_categories, retrieve_jobs, retrieve_jobs_by_category
 from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 from telegram.ext import CallbackQueryHandler, CommandHandler, ContextTypes, ConversationHandler, MessageHandler, filters
 from telegram.constants import ParseMode
 from re import findall
-from sqlalchemy import Result, ScalarResult, Select, select, func
-from utils.utils import create_inline_keyboard
+from utils.utils import close_inline_keyboard, create_inline_keyboard
 
 HELP_MESSAGE: str = '''\U00002753 <b>Guida all'utilizzo del comando /jobs</b>
 Visualizza la lista dei lavori proposti dai membri della community,
@@ -21,36 +18,7 @@ class NavigateJobs(Enum):
 JOB_CATEGORY_PATTERN: str = r'(.*)\s\(\d+\)'
 
 
-def get_job_categories_inline_keyboard():
-
-    job_categories: list = []
-    job_category_name: str = ''
-    job_category_count: int = 0
-
-    with SessionLocal() as db_session:
-
-        # Obtain the count and the name for each job category
-        sql_statement: Select = select(func.count(Job.id), JobCategory.name) \
-                                .join(JobCategory, Job.job_category) \
-                                .where(Job.deleted_at.is_(None)) \
-                                .group_by(Job.category_id)
-        
-        # Executing the SELECT statement
-        query_result: Result = db_session.execute(sql_statement)
-
-        if query_result:
-            
-            # Compose the list for the keyboard
-            for record in query_result:
-                job_category_count, job_category_name = record
-                job_categories.append(f'{job_category_name} ({job_category_count})')
-
-            job_categories_keyboard = create_inline_keyboard(num_columns=2, items=job_categories)
-
-        return job_categories_keyboard
-
-
-async def jobs(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def jobs(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
     # Delete the user typed command
     await update.message.delete()
@@ -68,39 +36,34 @@ async def jobs(update: Update, context: ContextTypes.DEFAULT_TYPE):
     jobs_count: int = 0
     text: str = ''
 
-    job_categories_keyboard = get_job_categories_inline_keyboard()
-    
-    # Initialize the db_session
-    # It closes automatically at the end of the "with" context manager
-    with SessionLocal() as db_session:
-    
-        # Select statement for the jobs' list
-        select_statement: Select = select(Job) \
-                                  .where(Job.deleted_at.is_(None)) \
-                                  .order_by(Job.created_at.desc())
-        
-        # Execute the query and get the result
-        query_result: ScalarResult = db_session.scalars(select_statement).all()
+    # Retrieving the list of job categories, with the count of jobs per category
+    job_categories: list = await retrieve_job_categories()
 
-        # If the query returned some data
-        if query_result:
-            
-            # Get the records' count
-            jobs_count = len(query_result)
+    # Create the job categories inline keyboard
+    job_categories_keyboard: InlineKeyboardMarkup = create_inline_keyboard(items=job_categories, num_columns=2)
+    
+    # Get the jobs' list
+    jobs_list: list[Job] = await retrieve_jobs()
 
-            # Set the text to display to the user
-            text = f'\U000025b6 Numero totale di lavori: {jobs_count}\n' + \
-                   'Clicca su una categoria per visualizzare la lista dei lavori.\n'
+    # If at least a job has been found
+    if jobs_list:
+                        
+        # Get the records' count
+        jobs_count = len(jobs_list)
+
+        # Set the text to display to the user
+        text = f'\U000025b6 Numero totale di lavori: {jobs_count}\n' + \
+                'Clicca su una categoria per visualizzare la lista dei lavori.\n'
+    
+        # Send the message to the user
+        await update.message.reply_text(text=text, 
+                                        reply_markup=job_categories_keyboard,
+                                        parse_mode=ParseMode.HTML)
         
-            # Send the message to the user
-            await update.message.reply_text(text=text, 
-                                            reply_markup=job_categories_keyboard,
-                                            parse_mode=ParseMode.HTML)
-            
-            return NavigateJobs.JOB_CATEGORY
-        
-        else:
-            await context.bot.send_message(chat_id=update.effective_chat.id, text='Nessun lavoro trovato!')
+        return NavigateJobs.JOB_CATEGORY
+    
+    else:
+        await context.bot.send_message(chat_id=update.effective_chat.id, text='Nessun lavoro trovato!')
 
         return ConversationHandler.END
     
@@ -115,99 +78,70 @@ async def handle_job_category(update: Update, context: ContextTypes.DEFAULT_TYPE
     job_category_name: str = findall(pattern=JOB_CATEGORY_PATTERN, string=callback_data)[0]
     text = f'Lista di lavori per la categoria "<i>{job_category_name}</i>":\n'
 
-    with SessionLocal() as db_session:
+    # Get the list of jobs by category name
+    jobs_list: list = await retrieve_jobs_by_category(job_category_name=job_category_name)
     
-        sql_statement: Select = select(JobCategory.id) \
-                                .where(JobCategory.name == job_category_name)
-        
-        job_category_id = db_session.scalar(sql_statement)
+    # Compose the list of jobs
+    for i, job in enumerate(jobs_list):
+        text += f'{i + 1}. <a href="{job.link}">{job.position}</a> - Dettagli\n'
 
-        sql_statement: Select = select(Job) \
-                                .where(Job.category_id == job_category_id)
-        
-        jobs = db_session.scalars(sql_statement).all()
-
-        # Compose the list of jobs
-        for i, job in enumerate(jobs):
-            text += f'{i + 1}. <a href="{job.link}">{job.position}</a> - Dettagli\n'
-
-        # Specify a callback_data is mandatory, otherwise the following error will be raised:
-        # telegram.error.BadRequest: Can't parse inline keyboard button: text buttons are unallowed in the inline keyboard
-        keyboard = InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text='\U000025C0 Indietro', callback_data='go_back')]
-        ])
-        
-        await query.edit_message_text(text=text, reply_markup=keyboard, parse_mode=ParseMode.HTML)
-
-        return NavigateJobs.GO_BACK
+    # Specify a callback_data is mandatory, otherwise the following error will be raised:
+    # telegram.error.BadRequest: Can't parse inline keyboard button: text buttons are unallowed in the inline keyboard
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text='\U000025C0 Indietro', callback_data='go_back')]
+    ])
     
+    await query.edit_message_text(text=text, reply_markup=keyboard, parse_mode=ParseMode.HTML)
+
+    return NavigateJobs.GO_BACK
+
 
 async def go_back(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     query = update.callback_query
-    query.answer()
+    await query.answer()
     
     # Variables initialization
     jobs_count: int = 0
     text: str = ''
 
-    job_categories_keyboard = get_job_categories_inline_keyboard()
-    
-    # Initialize the db_session
-    # It closes automatically at the end of the "with" context manager
-    with SessionLocal() as db_session:
-    
-        # Select statement for the jobs' list
-        select_statement: Select = select(Job) \
-                                  .where(Job.deleted_at.is_(None)) \
-                                  .order_by(Job.created_at.desc())
-        
-        # Execute the query and get the result
-        query_result: ScalarResult = db_session.scalars(select_statement).all()
+    # Retrieving the list of job categories, with the count of jobs per category
+    job_categories: list = await retrieve_job_categories()
 
-        # If the query returned some data
-        if query_result:
-            
-            # Get the records' count
-            jobs_count = len(query_result)
+    # Create the job categories inline keyboard
+    job_categories_keyboard: InlineKeyboardMarkup = create_inline_keyboard(items=job_categories, num_columns=2)
+    
+    # Get the jobs' list
+    jobs_list: list[Job] = await retrieve_jobs()
 
-            # Set the text to display to the user
-            text = f'\U000025b6 Numero totale di lavori: {jobs_count}\n' + \
-                   'Clicca su una categoria per filtrare la lista dei lavori.\n'
+    # If at least a job has been found
+    if jobs_list:
+                        
+        # Get the records' count
+        jobs_count = len(jobs_list)
+
+        # Set the text to display to the user
+        text = f'\U000025b6 Numero totale di lavori: {jobs_count}\n' + \
+                'Clicca su una categoria per visualizzare la lista dei lavori.\n'
+    
+        # Send the message to the user
+        await query.edit_message_text(text=text, 
+                                        reply_markup=job_categories_keyboard,
+                                        parse_mode=ParseMode.HTML)
         
-            # Send the message to the user
-            await query.edit_message_text(text=text, 
-                                          reply_markup=job_categories_keyboard,
-                                          parse_mode=ParseMode.HTML)
-            
-            return NavigateJobs.JOB_CATEGORY
-        
-        else:
-            await query.edit_message_text(text='Nessun lavoro trovato!')
+        return NavigateJobs.JOB_CATEGORY
+    
+    else:
+        await query.edit_message_text(text='Nessun lavoro trovato!')
 
         return ConversationHandler.END
     
 
-async def close_inline_keyboard(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    
-    query: CallbackQuery = update.callback_query
-    query.answer()
-
-    await query.delete_message()
-
-    return ConversationHandler.END
-
-
 async def handle_unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
-    keyboard = InlineKeyboardMarkup([[]])
-
-    await update.message.reply_text(text='Scelta non valida!', reply_markup=keyboard)
-
-    update.message.delete()
+    await update.message.reply_text(text='Scelta non valida!')
+    await update.message.delete()
     
-    return ConversationHandler.END
-
 
 jobs_handler = {
     'entry_points': [
@@ -219,11 +153,11 @@ jobs_handler = {
             CallbackQueryHandler(handle_job_category, pattern=JOB_CATEGORY_PATTERN)
         ],
         NavigateJobs.GO_BACK: [
-            CallbackQueryHandler(go_back, pattern='^go_back$')
+            CallbackQueryHandler(go_back, pattern=r'^go_back$')
         ]
     },
     'fallbacks': [
-        CallbackQueryHandler(close_inline_keyboard, pattern='^close_inline_keyboard$'),
+        CallbackQueryHandler(close_inline_keyboard, pattern=r'^close_inline_keyboard$'),
         MessageHandler(filters=filters.COMMAND | filters.TEXT, callback=handle_unknown),
-        ]
+    ]
 }
