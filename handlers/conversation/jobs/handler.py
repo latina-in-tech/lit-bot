@@ -1,36 +1,24 @@
 from dependencies.db import SessionLocal
+from enum import Enum
 from models.job.job import Job
-from sqlalchemy import Result, ScalarResult, Select, select
+from models.job_category.job_category import JobCategory
+from itertools import batched
 from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 from telegram.ext import CallbackQueryHandler, CommandHandler, ContextTypes, ConversationHandler, MessageHandler, filters
 from telegram.constants import ParseMode
 from re import findall
-from sqlalchemy import func
-from models.job_category.job_category import JobCategory
-from itertools import batched
-
+from sqlalchemy import Result, ScalarResult, Select, select, func
+from utils.utils import create_inline_keyboard
 
 HELP_MESSAGE: str = '''\U00002753 <b>Guida all'utilizzo del comando /jobs</b>
 Visualizza la lista dei lavori proposti dai membri della community,
 suddivisi per categoria.'''
 
-JOB_CATEGORY, GO_BACK = range(2)
+class NavigateJobs(Enum):
+    JOB_CATEGORY: int = 0
+    GO_BACK: int = 1
+
 JOB_CATEGORY_PATTERN: str = r'(.*)\s\(\d+\)'
-
-
-def create_inline_keyboard(num_columns: int, items: list) -> InlineKeyboardMarkup:
-        
-    keyboard: list = [
-        [InlineKeyboardButton(text=item, callback_data=item) for item in list(batch)] 
-        for batch in batched(iterable=items, n=num_columns)]
-    
-    keyboard.append(
-        [
-            InlineKeyboardButton(text='Chiudi \U0000274C', 
-                                 callback_data='close_inline_keyboard')
-        ])
-    
-    return InlineKeyboardMarkup(inline_keyboard=keyboard)
 
 
 def get_job_categories_inline_keyboard():
@@ -109,7 +97,7 @@ async def jobs(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                             reply_markup=job_categories_keyboard,
                                             parse_mode=ParseMode.HTML)
             
-            return JOB_CATEGORY
+            return NavigateJobs.JOB_CATEGORY
         
         else:
             await context.bot.send_message(chat_id=update.effective_chat.id, text='Nessun lavoro trovato!')
@@ -151,7 +139,7 @@ async def handle_job_category(update: Update, context: ContextTypes.DEFAULT_TYPE
         
         await query.edit_message_text(text=text, reply_markup=keyboard, parse_mode=ParseMode.HTML)
 
-        return GO_BACK
+        return NavigateJobs.GO_BACK
     
 
 async def go_back(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -192,7 +180,7 @@ async def go_back(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                           reply_markup=job_categories_keyboard,
                                           parse_mode=ParseMode.HTML)
             
-            return JOB_CATEGORY
+            return NavigateJobs.JOB_CATEGORY
         
         else:
             await query.edit_message_text(text='Nessun lavoro trovato!')
@@ -227,10 +215,10 @@ jobs_handler = {
                        callback=jobs)
     ],
     'states': {
-        JOB_CATEGORY: [
+        NavigateJobs.JOB_CATEGORY: [
             CallbackQueryHandler(handle_job_category, pattern=JOB_CATEGORY_PATTERN)
         ],
-        GO_BACK: [
+        NavigateJobs.GO_BACK: [
             CallbackQueryHandler(go_back, pattern='^go_back$')
         ]
     },
