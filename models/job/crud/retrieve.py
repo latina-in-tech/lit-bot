@@ -3,6 +3,17 @@ from models.job.job import Job
 from models.job_category.job_category import JobCategory
 from sqlalchemy import func, Result, ScalarResult, Select, select
 
+JOB_CATEGORIES_EMOJI: dict = {
+    'Back-end': '\U0001F310',
+    'Cybersecurity': '\U0001F510',
+    'DevOps & Cloud': '\U00002601',
+    'Front-end': '\U0001F4BB',
+    'Machine Learning & AI': '\U0001F916',
+    'Mobile': '\U0001F4F1',
+    'Quantum Computing': '\U0000269B',
+    'UX-UI': '\U0001F477'
+}
+
 
 async def retrieve_jobs() -> list[Job] | None:
 
@@ -21,12 +32,13 @@ async def retrieve_jobs() -> list[Job] | None:
         return query_result if query_result else None
     
 
-async def retrieve_job_categories_with_jobs_count() -> list[str]:
+async def retrieve_job_categories_with_jobs_count(include_emoji: bool = True) -> list[str]:
 
     # Variables initialization
     job_categories: list = []
     job_category_name: str = ''
     job_category_count: int = 0
+    button_text: str = ''
 
     # Initialize the db_session
     # It closes automatically at the end of the "with" context manager
@@ -46,7 +58,9 @@ async def retrieve_job_categories_with_jobs_count() -> list[str]:
             # Compose the list for the keyboard
             for record in query_result:
                 job_category_count, job_category_name = record
-                job_categories.append(f'{job_category_name} ({job_category_count})')
+                button_text = f'{JOB_CATEGORIES_EMOJI.get(job_category_name, '') if include_emoji else ''}' + ' ' + \
+                              f'{job_category_name} ({job_category_count})'
+                job_categories.append(button_text)
 
         return job_categories
         

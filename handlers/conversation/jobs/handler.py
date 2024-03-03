@@ -19,7 +19,8 @@ class NavigateJobs(Enum):
     JOB_CATEGORY: int = 0
     GO_BACK: int = 1
 
-JOB_CATEGORY_PATTERN: str = r'(.*)\s\(\d+\)'
+# Pattern used to extract Job Category name from InlineKeyboardButton
+JOB_CATEGORY_PATTERN: str = r'^\W+\s(.*)\s\(\d+\)$'
 
 
 async def jobs(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
