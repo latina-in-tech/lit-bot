@@ -1,8 +1,11 @@
 from enum import Enum
 from models.job.job import Job
-from models.job.crud.retrieve import retrieve_job_categories_with_jobs_count, retrieve_jobs, retrieve_jobs_by_category
+from models.job.crud.retrieve import (retrieve_job_categories_with_jobs_count, retrieve_jobs, 
+                                      retrieve_jobs_by_category)
 from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
-from telegram.ext import CallbackQueryHandler, CommandHandler, ContextTypes, ConversationHandler, MessageHandler, filters
+from telegram.ext import (CallbackQueryHandler, CommandHandler, 
+                          ContextTypes, ConversationHandler, 
+                          MessageHandler, filters)
 from telegram.constants import ParseMode
 from re import findall
 from utils.utils import close_inline_keyboard, create_inline_keyboard
@@ -142,6 +145,8 @@ async def handle_unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     await update.message.reply_text(text='Scelta non valida!')
     await update.message.delete()
+    
+    return
     
 
 jobs_handler = {

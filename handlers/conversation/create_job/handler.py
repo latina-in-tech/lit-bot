@@ -1,18 +1,11 @@
-from dependencies.db import SessionLocal
-from models.job.job import Job
-from models.job_category.job_category import JobCategory
-from models.contract_type.contract_type import ContractType
 from enum import Enum
-from sqlalchemy import Select, select, Result
-from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
+from models.contract_type.crud.retrieve import retrieve_contract_types, retrieve_contract_type_id_by_name
+from models.job_category.crud.retrieve import retrieve_job_categories, retrieve_job_category_id_by_name
+from telegram import ReplyKeyboardRemove, Update
 from telegram.constants import ParseMode
 from telegram.ext import ContextTypes, CommandHandler, ConversationHandler, filters, MessageHandler
-from itertools import batched
-
-
-def create_keyboard(num_columns: int, items: list) -> list[list]:
-    return [list(batch) for batch in batched(iterable=items, n=num_columns)]
-
+from utils.utils import create_reply_keyboard
+import models.job.crud.create
 
 # CreateJob Enum for the ConversationHandler steps
 class CreateJob(Enum):
@@ -26,69 +19,50 @@ class CreateJob(Enum):
 # Initialize an empty dict for the new job's data
 job_data: dict = {}
 
-with SessionLocal() as db_session:
+# Get list of contract types
+contract_types = retrieve_contract_types()
 
-    # Get contract types
-    sql_statement: Select = select(ContractType.name) \
-                            .order_by(ContractType.name)
+# Set the text to be displayed as hint in the text input field
+input_field_placeholder: str = 'Seleziona la tipologia di contratto del lavoro dal menu sottostante:'    
+
+# Keyboard
+# Each row is a list, and each button is an item
+contract_types_reply_keyboard: list = create_reply_keyboard(items=contract_types, 
+                                                            num_columns=3,
+                                                            input_field_placeholder=input_field_placeholder,
+                                                            has_close_button=False)
         
-    query_result: Result = db_session.execute(sql_statement).all()
+# Filter pattern
+contract_types_filter_pattern: str = f'^({'|'.join(contract_types)})$'
 
-    if query_result:
-        contract_types: list = [record[0] for record in query_result] 
+# Get list of job cateegories
+job_categories: list = retrieve_job_categories()
 
-        # Keyboard
-        # Each row is a list, and each button is an item
-        # On each row there are four buttons
-        contract_types_reply_keyboard: list = create_keyboard(num_columns=3, items=contract_types)
+# Keyboard
+# Each row is a list, and each button is an item
+job_categories_reply_keyboard = create_reply_keyboard(items=job_categories, 
+                                                            num_columns=2,
+                                                            input_field_placeholder=input_field_placeholder,
+                                                            has_close_button=False)
         
-        # Filter pattern
-        contract_types_filter_pattern: str = f'^({'|'.join(contract_types)})$'
-
-    # Get job categories
-    sql_statement: Select = select(JobCategory.name) \
-                            .order_by(JobCategory.name)
-
-    query_result: Result = db_session.execute(sql_statement).all()
-
-    if query_result:
-        job_categories: list = [record[0] for record in query_result] 
-
-        # Keyboard
-        job_categories_reply_keyboard = create_keyboard(num_columns=2, items=job_categories)
-        
-        # Filter pattern
-        category_ids_filter_pattern = f'^({'|'.join(job_categories)})$'
+# Filter pattern
+category_ids_filter_pattern = f'^({'|'.join(job_categories)})$'
 
 
 async def create_job(update: Update, context: ContextTypes.DEFAULT_TYPE):  
     
-    # Set the text to be displayed as hint in the text input field
-    input_field_placeholder: str = 'Seleziona la tipologia di contratto del lavoro dal menu sottostante:'
-    
     await update.message.reply_text('Seleziona la tipologia di contratto \U0001F4DD',
-                                    reply_markup=ReplyKeyboardMarkup(
-                                    keyboard=contract_types_reply_keyboard, 
-                                    one_time_keyboard=True,
-                                    input_field_placeholder=input_field_placeholder,
-                                    resize_keyboard=True))
+                                    reply_markup=contract_types_reply_keyboard)
 
     return CreateJob.CONTRACT_TYPE
 
 
 async def validate_contract_type(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
-    # Set the text to be displayed as hint in the text input field
-    input_field_placeholder: str = 'Seleziona la tipologia di contratto del lavoro dal menu sottostante:'
-    
     await update.message.reply_text('Attenzione! \U000026A0\n' + \
                                     'La scelta inserita non e\' valida.\n' + \
                                     'Seleziona la tipologia di contratto:',
-                                    reply_markup=ReplyKeyboardMarkup(
-                                    keyboard=contract_types_reply_keyboard, 
-                                    one_time_keyboard=True,
-                                    input_field_placeholder=input_field_placeholder,
-                                    resize_keyboard=True))
+                                    reply_markup=contract_types_reply_keyboard)
     
     return CreateJob.CONTRACT_TYPE
 
@@ -105,27 +79,17 @@ async def contract_type(update: Update, context: ContextTypes.DEFAULT_TYPE):
     input_field_placeholder: str = 'Seleziona la categoria del lavoro dal menu sottostante:'
 
     await update.message.reply_text('Seleziona la categoria \U0001F520',
-                                    reply_markup=ReplyKeyboardMarkup(
-                                    keyboard=job_categories_reply_keyboard, 
-                                    one_time_keyboard=True,
-                                    input_field_placeholder=input_field_placeholder,
-                                    resize_keyboard=True))
+                                    reply_markup=job_categories_reply_keyboard)
 
     return CreateJob.CATEGORY_ID
 
 
 async def validate_category_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
-    input_field_placeholder: str = 'Seleziona la categoria del lavoro dal menu sottostante:'
-
     await update.message.reply_text('Attenzione! \U000026A0\n' + \
                                     'La scelta inserita non e\' valida.\n' + \
                                     'Seleziona la categoria del lavoro:',
-                                    reply_markup=ReplyKeyboardMarkup(
-                                    keyboard=job_categories_reply_keyboard, 
-                                    one_time_keyboard=True,
-                                    input_field_placeholder=input_field_placeholder,
-                                    resize_keyboard=True))
+                                    reply_markup=job_categories_reply_keyboard)
     
     return CreateJob.CATEGORY_ID
 
@@ -200,37 +164,20 @@ async def validate_ral(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def normalize_job(job_data: dict):
 
-    # Initialize the db_session
-    # It closes automatically at the end of the "with" context manager
-    with SessionLocal() as db_session:
+    # Get the contract_type_id from its name
+    contract_type_id: int = await retrieve_contract_type_id_by_name(contract_name=job_data['contract_type_id'])
+    
+    # Update the job_data dictionary
+    job_data['contract_type_id'] = contract_type_id
+    
+    # Get the job_category_id from its name
+    category_id: int = await retrieve_job_category_id_by_name(job_category_name=job_data['category_id'])
+    
+    # Update the job_data dictionary
+    job_data['category_id'] = category_id
 
-        # Get the respective contract_type_id by its name
-        sql_statement: Select = select(ContractType.id).where(ContractType.name == job_data['contract_type_id'])
-        contract_type_id: int = db_session.scalar(sql_statement)
-        
-        # Update the job_data dictionary
-        job_data['contract_type_id'] = contract_type_id
-        
-        # Get the respective category_id by its name
-        sql_statement: Select = select(JobCategory.id).where(JobCategory.name == job_data['category_id'])
-        category_id: int = db_session.scalar(sql_statement)
-        
-        # Update the job_data dictionary
-        job_data['category_id'] = category_id
-
-        # Create the new job
-        job: Job = Job(**job_data)
-
-        # Add the job to the session
-        db_session.add(job)
-        
-        # If the job has correctly added to the session
-        if job in db_session:
-            db_session.commit()
-            return True
-        
-        return False
-
+    return await models.job.crud.create.create_job(job_data=job_data)
+    
 
 async def ral(update: Update, context: ContextTypes.DEFAULT_TYPE):
     

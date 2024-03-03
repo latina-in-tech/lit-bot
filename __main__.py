@@ -42,4 +42,5 @@ if __name__ == '__main__':
     unknown_handler = MessageHandler(filters.COMMAND, unknown)
     application.add_handler(unknown_handler)
 
-    application.run_polling(allowed_updates=Update.ALL_TYPES)   
+    # In order to use InlineKeyboard, allowed_updates=Update.ALL_TYPES must be set 
+    application.run_polling(allowed_updates=Update.ALL_TYPES)
