@@ -7,6 +7,7 @@ from telegram.ext import ContextTypes, CommandHandler, ConversationHandler, filt
 from utils.utils import create_reply_keyboard
 import models.job.crud.create
 
+
 # CreateJob Enum for the ConversationHandler steps
 class CreateJob(Enum):
     CONTRACT_TYPE: int = 0 
@@ -195,7 +196,7 @@ async def ral(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Normalization of the data (contract_type_id and category_id strings (column "name") become ids)
     if await normalize_job(job_data):
         
-        # https://t.me/c/1847839591/23/10959
+        # Create the job
         job = await models.job.crud.create.create_job(job_data=job_data)
 
         # If the job is correctly filled up
