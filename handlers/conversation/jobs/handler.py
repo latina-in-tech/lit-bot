@@ -88,7 +88,7 @@ async def handle_job_category(update: Update, context: ContextTypes.DEFAULT_TYPE
     
     # Compose the list of jobs
     for i, job in enumerate(jobs_list):
-        text += f'{i + 1}. <a href="{job.link}">{job.position}</a> - Dettagli\n'
+        text += f'{i + 1}. <a href="{job.link}">{job.position}</a>\n'
 
     # Specify a callback_data is mandatory, otherwise the following error will be raised:
     # telegram.error.BadRequest: Can't parse inline keyboard button: text buttons are unallowed in the inline keyboard
