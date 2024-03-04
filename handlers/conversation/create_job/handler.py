@@ -80,9 +80,6 @@ async def contract_type(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Set the contract_type_id (that here is string corresponding to the "name" column) of the contract_type
     job_data['contract_type_id'] = user_message
 
-    # Set the text to be displayed as hint in the text input field
-    input_field_placeholder: str = 'Seleziona la categoria del lavoro dal menu sottostante:'
-
     await update.message.reply_text('Seleziona la categoria \U0001F520',
                                     reply_markup=job_categories_reply_keyboard)
 
