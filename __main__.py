@@ -1,14 +1,16 @@
 from collections import OrderedDict
 from dotenv import dotenv_values
-from telegram import Update
-from telegram.ext import ApplicationBuilder, CommandHandler, ConversationHandler, MessageHandler, filters
 from handlers.command.start import start
 from handlers.command.events import events
 from handlers.conversation.jobs.handler import jobs_handler
 from handlers.command.cmds import cmds
 from handlers.conversation.create_job.handler import create_job_handler
 from handlers.message.unknown import unknown
+from telegram import Update
+from telegram.ext import ApplicationBuilder, CommandHandler, ConversationHandler, MessageHandler, filters
+from utils.utils import error_handler
 import logging
+
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -23,6 +25,7 @@ BOT_TOKEN: str = ENV_VARS['BOT_TOKEN']
 if __name__ == '__main__':
     
     application = ApplicationBuilder().token(BOT_TOKEN).build()
+    application.add_error_handler(error_handler)
     
     start_handler = CommandHandler('start', start)
     application.add_handler(start_handler)
