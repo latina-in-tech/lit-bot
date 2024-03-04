@@ -16,6 +16,10 @@ class CreateJob(Enum):
     LINK: int = 4
     RAL: int = 5
 
+# The actual group_chat_id is 1847839591, but in order to use it with the APIs,
+# we need to add the prefix of -100
+JOB_OFFERS_GROUP_CHAT_ID: int = -1001847839591
+
 # Initialize an empty dict for the new job's data
 job_data: dict = {}
 
@@ -176,8 +180,8 @@ async def normalize_job(job_data: dict):
     # Update the job_data dictionary
     job_data['category_id'] = category_id
 
-    return await models.job.crud.create.create_job(job_data=job_data)
-    
+    return True
+
 
 async def ral(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
@@ -190,7 +194,23 @@ async def ral(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # Normalization of the data (contract_type_id and category_id strings (column "name") become ids)
     if await normalize_job(job_data):
-        await update.message.reply_text('Lavoro creato correttamente \U00002705')
+        
+        # https://t.me/c/1847839591/23/10959
+        job = await models.job.crud.create.create_job(job_data=job_data)
+
+        # If the job is correctly filled up
+        if job:
+            
+            await update.message.reply_text('Lavoro creato correttamente \U00002705')
+
+            # Compose the message to send to the group chat
+            text: str = '\n'.join(f'<b>{k}</b>:{v}' for k,v in job.items())
+            
+            # Send the message to group chat
+            # https://gist.github.com/nafiesl/4ad622f344cd1dc3bb1ecbe468ff9f8a
+            await context.bot.send_message(chat_id=JOB_OFFERS_GROUP_CHAT_ID, 
+                                           text=text,
+                                           parse_mode=ParseMode.HTML)
     
     # End of the conversation
     return ConversationHandler.END
