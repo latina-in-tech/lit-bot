@@ -1,5 +1,5 @@
 from itertools import batched
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup
 from typing import Iterable
 from telegram import CallbackQuery, Update
 from telegram.ext import ContextTypes, ConversationHandler

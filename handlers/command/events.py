@@ -1,8 +1,5 @@
-from dependencies.db import SessionLocal
 from models.event.crud.retrieve import retrieve_events
-from models.event.event import Event
 from datetime import datetime
-from sqlalchemy import Select, ScalarResult, select
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ParseMode
