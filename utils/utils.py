@@ -1,6 +1,5 @@
 from itertools import batched
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup
-from typing import Iterable
 from telegram import CallbackQuery, Update
 from telegram.ext import ContextTypes, ConversationHandler
 import logging
@@ -9,14 +8,19 @@ import html
 import traceback
 
 
+items: list[dict] = [
+    {'text': '',
+     'callback_data': ''}
+]
 
-def create_inline_keyboard(items: Iterable, 
+def create_inline_keyboard(name: str, 
+                           items: list[dict], 
                            num_columns: int, 
                            has_close_button: bool = True) -> InlineKeyboardMarkup:
     
     # Create the keyboard
     inline_keyboard: list = [
-        [InlineKeyboardButton(text=item, callback_data=item) for item in list(batch)] 
+        [InlineKeyboardButton(**item) for item in list(batch)] 
         for batch in batched(iterable=items, n=num_columns)]
     
     # Add close button if not specified differently
@@ -24,7 +28,7 @@ def create_inline_keyboard(items: Iterable,
         inline_keyboard.append(
             [
                 InlineKeyboardButton(text='Chiudi \U0000274C', 
-                                     callback_data='close_inline_keyboard')
+                                     callback_data=f'{name}_close_inline_keyboard')
             ])
         
     return InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
@@ -40,7 +44,7 @@ async def close_inline_keyboard(update: Update, context: ContextTypes.DEFAULT_TY
     return ConversationHandler.END
 
 
-def create_reply_keyboard(items: Iterable, 
+def create_reply_keyboard(items: list, 
                           num_columns: int, 
                           input_field_placeholder: str,
                           has_close_button: bool = True) -> ReplyKeyboardMarkup:

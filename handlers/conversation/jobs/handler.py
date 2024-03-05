@@ -20,7 +20,8 @@ class NavigateJobs(Enum):
     GO_BACK: int = 1
 
 # Pattern used to extract Job Category name from InlineKeyboardButton
-JOB_CATEGORY_PATTERN: str = r'^\W+\s(.*)\s\(\d+\)$'
+# JOB_CATEGORY_PATTERN: str = r'^\W+\s(.*)\s\(\d+\)$'
+JOB_CATEGORY_PATTERN: str = ''
 
 
 async def jobs(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -42,10 +43,16 @@ async def jobs(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     text: str = ''
 
     # Retrieving the list of job categories, with the count of jobs per category
-    job_categories: list = await retrieve_job_categories_with_jobs_count()
+    job_category_items: list = await retrieve_job_categories_with_jobs_count(include_emoji=True)
+
+    job_categories = [v for d in job_category_items for v in d.values()]
+
+    global JOB_CATEGORY_PATTERN
+    
+    JOB_CATEGORY_PATTERN = f'({'|'.join(job_categories)})'
 
     # Create the job categories inline keyboard
-    job_categories_keyboard: InlineKeyboardMarkup = create_inline_keyboard(items=job_categories, num_columns=2)
+    job_categories_keyboard: InlineKeyboardMarkup = create_inline_keyboard(name='jck', items=job_category_items, num_columns=2)
     
     # Get the jobs' list
     jobs_list: list[Job] = await retrieve_jobs()
@@ -79,8 +86,7 @@ async def handle_job_category(update: Update, context: ContextTypes.DEFAULT_TYPE
     query: CallbackQuery = update.callback_query
     await query.answer()
 
-    callback_data = query.data
-    job_category_name: str = findall(pattern=JOB_CATEGORY_PATTERN, string=callback_data)[0]
+    job_category_name: str = query.data
     text = f'Lista di lavori per la categoria "<i>{job_category_name}</i>":\n'
 
     # Get the list of jobs by category name
@@ -93,12 +99,46 @@ async def handle_job_category(update: Update, context: ContextTypes.DEFAULT_TYPE
     # Specify a callback_data is mandatory, otherwise the following error will be raised:
     # telegram.error.BadRequest: Can't parse inline keyboard button: text buttons are unallowed in the inline keyboard
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [
+            InlineKeyboardButton(text='\U0001F520 Ordina per', callback_data='set_order_by'),
+            InlineKeyboardButton(text='\U00002195 ASC/DESC', callback_data='set_asc_desc')
+        ],
         [InlineKeyboardButton(text='\U000025C0 Indietro', callback_data='go_back')]
     ])
     
     await query.edit_message_text(text=text, reply_markup=keyboard, parse_mode=ParseMode.HTML)
 
     return NavigateJobs.GO_BACK
+
+
+async def set_order_by(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    # TODO:
+    # Name the keyboard in order to have different keyboards to manage better
+    # the various callback queries
+    
+    # TODO:
+    # Get the current Order By clause
+
+    # TODO:
+    # Get the current order clause
+    
+    ORDER_BY_COLUMNS: list[str] = [
+        'Nome',
+        '\U00002716 Data di creazione',
+        'RAL'
+    ]
+
+    query: CallbackQuery = update.callback_query
+    await query.answer()
+
+    keyboard = create_inline_keyboard(name='order_by_menu',
+                                      items=ORDER_BY_COLUMNS,
+                                      num_columns=1,
+                                      has_close_button=False)
+
+    await query.edit_message_text(text='Imposta la colonna di ordinamento:',
+                                  reply_markup=keyboard)
 
 
 async def go_back(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -111,10 +151,10 @@ async def go_back(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text: str = ''
 
     # Retrieving the list of job categories, with the count of jobs per category
-    job_categories: list = await retrieve_job_categories_with_jobs_count()
+    job_categories: list = await retrieve_job_categories_with_jobs_count(include_emoji=True)
 
     # Create the job categories inline keyboard
-    job_categories_keyboard: InlineKeyboardMarkup = create_inline_keyboard(items=job_categories, num_columns=2)
+    job_categories_keyboard: InlineKeyboardMarkup = create_inline_keyboard(name='jck', items=job_categories, num_columns=2)
     
     # Get the jobs' list
     jobs_list: list[Job] = await retrieve_jobs()
@@ -157,14 +197,15 @@ jobs_handler = {
     ],
     'states': {
         NavigateJobs.JOB_CATEGORY: [
-            CallbackQueryHandler(handle_job_category, pattern=JOB_CATEGORY_PATTERN)
+            CallbackQueryHandler(handle_job_category, pattern=JOB_CATEGORY_PATTERN),
         ],
         NavigateJobs.GO_BACK: [
+            CallbackQueryHandler(set_order_by, pattern=r'^set_order_by$'),
             CallbackQueryHandler(go_back, pattern=r'^go_back$')
         ]
     },
     'fallbacks': [
-        CallbackQueryHandler(close_inline_keyboard, pattern=r'^close_inline_keyboard$'),
+        CallbackQueryHandler(close_inline_keyboard, pattern=r'.*close_inline_keyboard$'),
         MessageHandler(filters=filters.COMMAND | filters.TEXT, callback=handle_unknown),
     ]
 }

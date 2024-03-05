@@ -32,7 +32,7 @@ async def retrieve_jobs() -> list[Job] | None:
         return query_result if query_result else None
     
 
-async def retrieve_job_categories_with_jobs_count(include_emoji: bool = True) -> list[str]:
+async def retrieve_job_categories_with_jobs_count(include_emoji: bool) -> list[str]:
 
     # Variables initialization
     job_categories: list = []
@@ -60,7 +60,12 @@ async def retrieve_job_categories_with_jobs_count(include_emoji: bool = True) ->
                 job_category_count, job_category_name = record
                 button_text = f'{JOB_CATEGORIES_EMOJI.get(job_category_name, '') if include_emoji else ''}' + ' ' + \
                               f'{job_category_name} ({job_category_count})'
-                job_categories.append(button_text)
+                button_callback_data = job_category_name
+                item = {
+                    'text': button_text,
+                    'callback_data': button_callback_data
+                }
+                job_categories.append(item)
 
         return job_categories
         
