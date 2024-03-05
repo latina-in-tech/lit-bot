@@ -19,7 +19,9 @@ class CreateJob(Enum):
 
 # The actual group_chat_id is 1847839591, but in order to use it with the APIs,
 # we need to add the prefix of -100
+# https://t.me/c/1847839591/23/10957
 JOB_OFFERS_GROUP_CHAT_ID: int = -1001847839591
+JOB_OFFERS_GROUP_THREAD_ID: int = 23
 
 # Initialize an empty dict for the new job's data
 job_data: dict = {}
@@ -202,11 +204,12 @@ async def ral(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_text('Lavoro creato correttamente \U00002705')
 
             # Compose the message to send to the group chat
-            text: str = '\n'.join(f'<b>{k}</b>:{v}' for k,v in job.items())
+            text: str = '\n'.join(f'<b>{k}</b>: {v}' for k,v in job.items())
             
             # Send the message to group chat
             # https://gist.github.com/nafiesl/4ad622f344cd1dc3bb1ecbe468ff9f8a
-            await context.bot.send_message(chat_id=JOB_OFFERS_GROUP_CHAT_ID, 
+            await context.bot.send_message(chat_id=JOB_OFFERS_GROUP_CHAT_ID,
+                                           message_thread_id=JOB_OFFERS_GROUP_THREAD_ID,
                                            text=text,
                                            parse_mode=ParseMode.HTML)
     
