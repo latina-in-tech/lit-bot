@@ -1,6 +1,7 @@
+from dependencies.db import SessionLocal
 from models.contract_type.contract_type import ContractType
 from models.job_category.job_category import JobCategory
-from dependencies.db import SessionLocal
+from models.user_role.user_role import UserRole
 
 
 CONTRACT_TYPES: list = [
@@ -22,6 +23,11 @@ JOB_CATEGORIES: list = [
     'UX-UI'
 ]
 
+USER_ROLES: list = [
+    'User',
+    'Moderator',
+    'Administrator'
+]
 
 with SessionLocal() as db_session:
 
@@ -34,5 +40,11 @@ with SessionLocal() as db_session:
         record: dict = {'name': item}
         job_category = JobCategory(**record)
         db_session.add(job_category)
+    
+    for item in USER_ROLES:
+        record: dict = {'name': item}
+        user_role = UserRole(**record)
+        db_session.add(user_role)
+
 
     db_session.commit()
