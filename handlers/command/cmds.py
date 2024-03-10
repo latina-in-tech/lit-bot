@@ -10,6 +10,7 @@ COMMANDS_LIST: dict = {
     '/events': 'Visualizza la lista degli eventi della community in programma',
     '/faq': 'Mostra le FAQ del gruppo',
     '/jobs': 'Visualizza la lista dei lavori proposti dai membri della community',
+    '/slides': 'Visualizza il link per scaricare i template delle slides per i talk della LiT',
     '/start': 'Avvia il bot'
 }
 

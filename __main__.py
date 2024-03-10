@@ -6,6 +6,7 @@ from handlers.conversation.jobs.handler import jobs_handler
 from handlers.command.cmds import cmds
 from handlers.command.faq import faq
 from handlers.command.contacts import contacts
+from handlers.command.slides import slides
 from handlers.conversation.create_job.handler import create_job_handler
 from handlers.message.unknown import unknown
 from telegram import Update
@@ -47,6 +48,8 @@ if __name__ == '__main__':
     contacts_handler = CommandHandler('contacts', contacts)
     application.add_handler(contacts_handler)
 
+    slides_handler = CommandHandler('slides', slides)
+    application.add_handler(slides_handler)
 
     create_job_handler = ConversationHandler(**create_job_handler)
     application.add_handler(create_job_handler)
