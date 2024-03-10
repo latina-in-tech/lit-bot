@@ -25,7 +25,7 @@ BOT_TOKEN: str = ENV_VARS['BOT_TOKEN']
 if __name__ == '__main__':
     
     application = ApplicationBuilder().token(BOT_TOKEN).build()
-    application.add_error_handler(error_handler)
+    # application.add_error_handler(error_handler)
     
     start_handler = CommandHandler('start', start)
     application.add_handler(start_handler)
