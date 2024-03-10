@@ -9,24 +9,24 @@ import html
 import traceback
 
 
-
-def create_inline_keyboard(items: Iterable, 
+def create_inline_keyboard(name: str, 
+                           items: list[dict], 
                            num_columns: int, 
                            has_close_button: bool = True) -> InlineKeyboardMarkup:
     
     # Create the keyboard
     inline_keyboard: list = [
-        [InlineKeyboardButton(text=item, callback_data=item) for item in list(batch)] 
+        [InlineKeyboardButton(**item) for item in list(batch)] 
         for batch in batched(iterable=items, n=num_columns)]
-    
+
     # Add close button if not specified differently
     if has_close_button:
         inline_keyboard.append(
             [
                 InlineKeyboardButton(text='Chiudi \U0000274C', 
-                                     callback_data='close_inline_keyboard')
+                                     callback_data=f'{name}_close_inline_keyboard')
             ])
-        
+
     return InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
 
 

@@ -32,20 +32,22 @@ async def retrieve_jobs() -> list[Job] | None:
         return query_result if query_result else None
     
 
-async def retrieve_job_categories_with_jobs_count(include_emoji: bool = True) -> list[str]:
+async def retrieve_job_categories_with_jobs_count() -> list[dict]:
 
     # Variables initialization
-    job_categories: list = []
     job_category_name: str = ''
     job_category_count: int = 0
-    button_text: str = ''
+    text: str = ''
+    callback_data: str = ''
+    item: dict = {}
+    job_categories: list = []
 
     # Initialize the db_session
     # It closes automatically at the end of the "with" context manager
     with SessionLocal() as db_session:
 
         # Obtain the count and the name for each job category
-        sql_statement: Select = select(func.count(Job.id), JobCategory.name) \
+        sql_statement: Select = select(JobCategory.name, func.count(Job.id)) \
                                 .join(JobCategory, Job.job_category) \
                                 .where(Job.deleted_at.is_(None)) \
                                 .group_by(Job.category_id)
@@ -57,10 +59,15 @@ async def retrieve_job_categories_with_jobs_count(include_emoji: bool = True) ->
             
             # Compose the list for the keyboard
             for record in query_result:
-                job_category_count, job_category_name = record
-                button_text = f'{JOB_CATEGORIES_EMOJI.get(job_category_name, '') if include_emoji else ''}' + ' ' + \
-                              f'{job_category_name} ({job_category_count})'
-                job_categories.append(button_text)
+                job_category_name, job_category_count = record
+                text = f'{JOB_CATEGORIES_EMOJI.get(job_category_name, '')} {job_category_name} ({job_category_count})'
+                callback_data = job_category_name
+                item = {
+                    'text': text,
+                    'callback_data': callback_data
+                }
+
+                job_categories.append(item)
 
         return job_categories
         
@@ -84,3 +91,21 @@ async def retrieve_jobs_by_category(job_category_name: str) -> list[Job] | None:
         query_result: list = db_session.scalars(sql_statement).all()
 
         return query_result if query_result else None
+    
+
+def retrieve_job_category_pattern() -> str:
+
+    # Initialize the db_session
+    # It closes automatically at the end of the "with" context manager
+    with SessionLocal() as db_session:
+    
+        # Getjob categories
+        sql_statement: Select = select(JobCategory.name) \
+                                .order_by(JobCategory.name)
+        
+        query_result: ScalarResult = db_session.scalars(sql_statement).all()
+
+        if query_result:
+            return f'(?:{'|'.join([job_category for job_category in query_result])})'
+        
+    

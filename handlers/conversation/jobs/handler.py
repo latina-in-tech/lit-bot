@@ -1,7 +1,7 @@
 from enum import Enum
 from models.job.job import Job
 from models.job.crud.retrieve import (retrieve_job_categories_with_jobs_count, retrieve_jobs, 
-                                      retrieve_jobs_by_category)
+                                      retrieve_jobs_by_category, retrieve_job_category_pattern)
 from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 from telegram.ext import (CallbackQueryHandler, CommandHandler, 
                           ContextTypes, ConversationHandler, 
@@ -18,9 +18,6 @@ suddivisi per categoria.'''
 class NavigateJobs(Enum):
     JOB_CATEGORY: int = 0
     GO_BACK: int = 1
-
-# Pattern used to extract Job Category name from InlineKeyboardButton
-JOB_CATEGORY_PATTERN: str = r'^\W+\s(.*)\s\(\d+\)$'
 
 
 async def jobs(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -45,7 +42,9 @@ async def jobs(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     job_categories: list = await retrieve_job_categories_with_jobs_count()
 
     # Create the job categories inline keyboard
-    job_categories_keyboard: InlineKeyboardMarkup = create_inline_keyboard(items=job_categories, num_columns=2)
+    job_categories_keyboard: InlineKeyboardMarkup = create_inline_keyboard(name='jck', 
+                                                                           items=job_categories, 
+                                                                           num_columns=2)
     
     # Get the jobs' list
     jobs_list: list[Job] = await retrieve_jobs()
@@ -68,7 +67,7 @@ async def jobs(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
         return NavigateJobs.JOB_CATEGORY
     
     else:
-        await context.bot.send_message(chat_id=update.effective_chat.id, text='Nessun lavoro trovato!')
+        await update.message.reply_text(text='Nessun lavoro trovato!')
 
         return ConversationHandler.END
     
@@ -79,8 +78,7 @@ async def handle_job_category(update: Update, context: ContextTypes.DEFAULT_TYPE
     query: CallbackQuery = update.callback_query
     await query.answer()
 
-    callback_data = query.data
-    job_category_name: str = findall(pattern=JOB_CATEGORY_PATTERN, string=callback_data)[0]
+    job_category_name = query.data
     text = f'Lista di lavori per la categoria "<i>{job_category_name}</i>":\n'
 
     # Get the list of jobs by category name
@@ -88,7 +86,7 @@ async def handle_job_category(update: Update, context: ContextTypes.DEFAULT_TYPE
     
     # Compose the list of jobs
     for i, job in enumerate(jobs_list):
-        text += f'{i + 1}. <a href="{job.link}">{job.position}</a>\n'
+        text += f'{i + 1}. <a href="{job.link}">{job.position}</a>{f' - RAL: € {job.ral:,}' if job.ral else ''}\n'
 
     # Specify a callback_data is mandatory, otherwise the following error will be raised:
     # telegram.error.BadRequest: Can't parse inline keyboard button: text buttons are unallowed in the inline keyboard
@@ -114,7 +112,9 @@ async def go_back(update: Update, context: ContextTypes.DEFAULT_TYPE):
     job_categories: list = await retrieve_job_categories_with_jobs_count()
 
     # Create the job categories inline keyboard
-    job_categories_keyboard: InlineKeyboardMarkup = create_inline_keyboard(items=job_categories, num_columns=2)
+    job_categories_keyboard: InlineKeyboardMarkup = create_inline_keyboard(name='jck', 
+                                                                           items=job_categories, 
+                                                                           num_columns=2)
     
     # Get the jobs' list
     jobs_list: list[Job] = await retrieve_jobs()
@@ -137,7 +137,7 @@ async def go_back(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return NavigateJobs.JOB_CATEGORY
     
     else:
-        await query.edit_message_text(text='Nessun lavoro trovato!')
+        await update.message.reply_text(text='Nessun lavoro trovato!')
 
         return ConversationHandler.END
     
@@ -157,14 +157,14 @@ jobs_handler = {
     ],
     'states': {
         NavigateJobs.JOB_CATEGORY: [
-            CallbackQueryHandler(handle_job_category, pattern=JOB_CATEGORY_PATTERN)
+            CallbackQueryHandler(handle_job_category, pattern=retrieve_job_category_pattern()),         
         ],
         NavigateJobs.GO_BACK: [
             CallbackQueryHandler(go_back, pattern=r'^go_back$')
         ]
     },
     'fallbacks': [
-        CallbackQueryHandler(close_inline_keyboard, pattern=r'^close_inline_keyboard$'),
-        MessageHandler(filters=filters.COMMAND | filters.TEXT, callback=handle_unknown),
+        CallbackQueryHandler(close_inline_keyboard, pattern=r'^jck_close_inline_keyboard$'),
+        MessageHandler(filters=filters.COMMAND | filters.TEXT, callback=handle_unknown)
     ]
 }
