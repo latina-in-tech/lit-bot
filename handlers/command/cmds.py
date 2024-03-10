@@ -7,6 +7,7 @@ COMMANDS_LIST: dict = {
     '/cmds': 'Visualizza la lista dei comandi eseguibili dal bot',
     '/create_job': 'Crea una nuova offerta di lavoro',
     '/events': 'Visualizza la lista degli eventi della community in programma',
+    '/faq': 'Mostra le FAQ del gruppo',
     '/jobs': 'Visualizza la lista dei lavori proposti dai membri della community',
     '/start': 'Avvia il bot'
 }
