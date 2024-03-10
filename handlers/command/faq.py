@@ -3,8 +3,7 @@ from telegram.ext import ContextTypes
 from telegram.constants import ParseMode
 
 
-MESSAGE: str = '''\U00002753 <b>FAQ</b>
-
+MESSAGE: str = '''\U00002753 <b>FAQ:</b>
 <i>Che cos'è Latina in Tech (LiT)?</i>
 Si tratta di una comunita' (lo so, fa tanto centro di recupero per tossicodipendenti \U0001F62C), 
 il cui fulcro e' un gruppo Telegram suddiviso in topics, con l'obiettivo di mettere in contatto appassionati
