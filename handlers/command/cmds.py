@@ -5,6 +5,7 @@ from telegram.constants import ParseMode
 
 COMMANDS_LIST: dict = {
     '/cmds': 'Visualizza la lista dei comandi eseguibili dal bot',
+    '/contacts': 'Visualizza i contatti della LiT',
     '/create_job': 'Crea una nuova offerta di lavoro',
     '/events': 'Visualizza la lista degli eventi della community in programma',
     '/faq': 'Mostra le FAQ del gruppo',
