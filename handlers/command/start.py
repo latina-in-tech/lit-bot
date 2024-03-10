@@ -8,8 +8,7 @@ from models.user.crud.create import save_user_info
 
 START_MESSAGE: str = 'Ciao {user_full_name}! \U0001F44B\n' + \
                      'Sono il bot del gruppo Latina In Tech \U0001F916\n' + \
-                     'Utilizza il comando /cmds per vedere cosa posso fare.\n' + \
-                     'Per ulteriori informazioni, rivolgiti pure a un admin del gruppo \U0001F60A'
+                     'Utilizza il comando /cmds per visualizzare la lista dei comandi disponibili.\n'
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -23,7 +22,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     START_MESSAGE = START_MESSAGE.format(user_full_name=user.full_name)
 
     # Send start message
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=START_MESSAGE, parse_mode=ParseMode.HTML)
+    await update.message.reply_text(text=START_MESSAGE, parse_mode=ParseMode.HTML)
 
     # Get the list of available commands from UDF commands
     bot_commands: list[BotCommand] = [BotCommand(command_name, command_description) 
