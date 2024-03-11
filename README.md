@@ -168,7 +168,7 @@ You can see the whole process through the following images.
 <details>
     <summary>Click here to expand</summary><br>
     
-![create_job - start](/docs/images/conversation/create_job_start.png)
+![create_job - start](/docs/images/conversation/create_job/create_job_start.png)
 
 ![create_job - contract type](/docs/images/conversation/create_job/create_job_contract_type.png)
 
