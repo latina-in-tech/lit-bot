@@ -2,27 +2,23 @@ from handlers.command.cmds import COMMANDS_LIST
 from telegram import Update, BotCommand, MenuButton, MenuButtonCommands
 from telegram.ext import ContextTypes
 from telegram.constants import ParseMode
-
 from models.user.crud.create import save_user_info
-
-
-START_MESSAGE: str = 'Ciao {user_full_name}! \U0001F44B\n' + \
-                     'Sono il bot del gruppo Latina In Tech \U0001F916\n' + \
-                     'Utilizza il comando /cmds per visualizzare la lista dei comandi disponibili.\n'
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
-    global START_MESSAGE
 
     # Get the user who sent the /start command
     user = update.effective_user
     
     # Update the start message
-    START_MESSAGE = START_MESSAGE.format(user_full_name=user.full_name)
+    message: str = f'Ciao {user.full_name}! \U0001F44B\n' + \
+                    'Sono il bot del gruppo Latina In Tech \U0001F916\n' + \
+                    'Utilizza il comando /cmds per visualizzare la lista dei comandi disponibili.'
+
 
     # Send start message
-    await update.message.reply_text(text=START_MESSAGE, parse_mode=ParseMode.HTML)
+    await update.message.reply_text(text=message, parse_mode=ParseMode.HTML)
 
     # Get the list of available commands from UDF commands
     bot_commands: list[BotCommand] = [BotCommand(command_name, command_description) 

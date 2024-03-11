@@ -1,7 +1,7 @@
-from dependencies.db import SessionLocal
-from models.contract_type.contract_type import ContractType
-from models.job_category.job_category import JobCategory
-from models.user_role.user_role import UserRole
+from app.dependencies.db import SessionLocal
+from app.models.contract_type.contract_type import ContractType
+from app.models.job_category.job_category import JobCategory
+from app.models.user_role.user_role import UserRole
 
 
 CONTRACT_TYPES: list = [
