@@ -18,6 +18,11 @@ At the moment, the features implemented in the bot are:
 - [view community events](#view-community-events)
 - [creation of a new job offer](#creation-of-a-new-job-offer)
 - [view job offers registered by community users](#view-job-offers-registered-by-community-users)
+- download slides templates for lightining talks
+- view community contacts
+- view bot commands
+- view community FAQ
+- view community rules
 
 [Go to index ↑](#index)
 
@@ -137,7 +142,7 @@ Once the Docker container is created and is running, the application is ready to
 To use the LatinaInTech bot, you need to search for it on Telegram by typing `@latinaintechbot` in the general search bar.<br>
 Once you have found the bot, you can proceed with launching it, making sure you receive the welcome message as shown below:
 
-**TODO - Example**
+![start command](/docs/images/commands/start.png)
 
 [Go to index ↑](#index)
 
@@ -158,16 +163,39 @@ To see upcoming community events, you need to type the `/events` command, which 
 [Go to index ↑](#index)
 
 ### Creation of a new job offer
-To create a new job offer, you need to type the command `/create_job`, which will start a conversation with the user, asking for the various fields required to correctly register the job offer.
+To create a new job offer, you need to type the command `/create_job`, which will start a conversation with the user, asking for the various fields required to correctly register the job offer.<br>
+You can see the whole process through the following images.
+<details>
+    <summary>Click here to expand</summary><br>
+    
+![create_job - start](/docs/images/conversation/create_job_start.png)
+
+![create_job - contract type](/docs/images/conversation/create_job/create_job_contract_type.png)
+
+![create_job - job category](/docs/images/conversation/create_job/create_job_job_categry.png)
+
+![create_job - job position](/docs/images/conversation/create_job/creat_job_position.png)
+
+![create_job - job description](/docs/images/conversation/create_job/create_job_description.png)
+
+![create_job - job link](/docs/images/conversation/create_job/create_job_link.png)
+
+![create_job - job ral](/docs/images/conversation/create_job/create_job_ral.png)
+
+![create_job - job created](/docs/images/conversation/create_job/create_job_job_created.png)
+
+</details>
+<br>
 
 [Go to index ↑](#index)
 
 ### View job offers registered by community users
 To view the list of job offers registered within the community, you need to type the `/jobs` command, which will show a list like the one below:
 
-It is possible to filter the output using the appriopriate parameters.<br>
-To see the full list of usable parameters, use the switch `help` with the `/jobs` command.
+![jobs - jobs start](/docs/images/conversation/jobs/jobs_start.png)
 
-**TODO - Example**
+![jobs - jobs category](/docs/images/conversation/jobs/jobs_job_category.png)
+
+![jobs - jobs category selected](/docs/images/conversation/jobs/jobs_job_category_selected.png)
 
 [Go to index ↑](#index)
