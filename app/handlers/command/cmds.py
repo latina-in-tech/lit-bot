@@ -9,8 +9,8 @@ COMMANDS_LIST: dict = {
     '/create_job': 'Crea una nuova offerta di lavoro',
     '/events': 'Visualizza la lista degli eventi della community in programma',
     '/faq': 'Visualizza le FAQ del gruppo',
-    '/rules': 'Visualizza le regole del gruppo',
     '/jobs': 'Visualizza la lista dei lavori proposti dai membri della community',
+    '/rules': 'Visualizza le regole del gruppo',
     '/slides': 'Visualizza il link per scaricare i template delle slides per i talk della LiT',
     '/start': 'Avvia il bot'
 }
