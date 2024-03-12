@@ -49,6 +49,8 @@ Then, you can choose to install the application in two ways:
 If you want to install the application on your PC, then keep following this guide;<br>
 otherwise, jump directly to the setup guide [using Docker containers.](#setup-using-docker-containers)
 
+In both cases, you still need to setup your .env file in order to get the application working correctly.
+
 ### Setup on your PC
 
 Once this point has been established, we can move on to the phase of creating the Python virtual environment, within which all the dependencies necessary for the correct functioning of the application will be installed.
@@ -98,13 +100,7 @@ SA_DB_DRIVER=pysqlite
 SA_DB_FILEPATH=db.sqlite
 ``` 
 
-Once the .env file has been created, and the variables have been correctly valued, you can proceed with seeding the SQLite database, using the command:
-
-```console
-python .\seeder.py
-```
-
-Once the SQLite database has been seeded, the application is ready to be used, running the command:
+Once the .env file has been created, and the variables have been correctly valued, the application is ready to be used, running the command:
 
 ```console
 python .

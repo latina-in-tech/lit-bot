@@ -8,5 +8,10 @@ services:
       dockerfile: Dockerfile
     image: lit-bot-image
     env_file:
-      - ".env"
+      - "app/.env"
     restart: always
+    volumes:
+      - db-data:/app/database
+volumes:
+  db-data:
+    name: "lit-bot-data"
