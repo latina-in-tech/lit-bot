@@ -20,7 +20,8 @@ JOB_CATEGORIES: list = [
     'Cybersecurity',
     'DevOps & Cloud',
     'Front-end',
-    'Machine Learning & AI',
+    'Full stack'
+    'ML & AI',
     'Mobile',
     'Quantum Computing',
     'UX-UI'
