@@ -149,7 +149,7 @@ async def link(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Set the job's link
     job_data['link'] = user_message if user_message != 'n.a.' else None
     
-    await update.message.reply_text(text='Inserisci il RAL del lavoro \U0001F4B2\n' + \
+    await update.message.reply_text(text='Inserisci il compenso totale del lavoro (annuo o totale) \U0001F4B2\n' + \
                                     '<i>Esempio: 50000</i>\n' + \
                                     '<i>Se non applicabile: n.a.</i>',
                                     parse_mode=ParseMode.HTML)
@@ -160,8 +160,8 @@ async def link(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def validate_ral(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     await update.message.reply_text('Attenzione! \U000026A0\n' + \
-                                    'La RAL inserita non e\' valida.\n' + \
-                                    'Inserisci il RAL del lavoro:')
+                                    'Il compenso totale del lavoro non e\' corretto.\n' + \
+                                    'Inserisci il compenso totale del lavoro (annuo o totale):')
     
     return CreateJob.RAL
 
