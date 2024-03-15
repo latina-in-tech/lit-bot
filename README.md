@@ -15,9 +15,18 @@ The idea of having a bot to offer group users a series of additional features to
 
 ## Current features
 At the moment, the features implemented in the bot are:
+
+### Events:
 - [view community events](#view-community-events)
+
+### Jobs:
 - [creation of a new job offer](#creation-of-a-new-job-offer)
 - [view job offers registered by community users](#view-job-offers-registered-by-community-users)
+
+### User management:
+- [set user role](#set-user-role)
+
+### General:
 - download slides templates for lightining talks
 - view community contacts
 - view bot commands
@@ -44,10 +53,10 @@ To use the bot, you need to have a Telegram API token, which can be obtained by 
 
 Then, you can choose to install the application in two ways:
 - on your PC
-- using Docker containers
+- using Docker
 
 If you want to install the application on your PC, then keep following this guide;<br>
-otherwise, jump directly to the setup guide [using Docker containers.](#setup-using-docker-containers)
+otherwise, jump directly to the setup guide [using Docker.](#setup-using-docker)
 
 In both cases, you still need to setup your .env file in order to get the application working correctly.
 
@@ -108,7 +117,7 @@ python .
 
 [Go to index ↑](#index)
 
-### Setup using Docker containers
+### Setup using Docker
 
 In order to use Docker containers to setup the application, you need to have Docker Desktop installed in your operating system.
 
@@ -129,7 +138,7 @@ You can also use Docker Compose to build and run the application stack, using th
 docker compose up --detach
 ```
 
-Once the Docker container is created and is running, the application is ready to be used.
+Once the Docker container/stack is created and is running, the application is ready to be used.
 
 [Go to index ↑](#index)
 
@@ -151,6 +160,7 @@ For guidance on how to use individual commands, you can type the command you wan
 
 [Go to index ↑](#index)
 
+## Events
 ### View community events
 To see upcoming community events, you need to type the `/events` command, which will display a list like the one below:
 
@@ -158,6 +168,7 @@ To see upcoming community events, you need to type the `/events` command, which 
 
 [Go to index ↑](#index)
 
+## Jobs
 ### Creation of a new job offer
 To create a new job offer, you need to type the command `/create_job`, which will start a conversation with the user, asking for the various fields required to correctly register the job offer.<br>
 You can see the whole process through the following images.
@@ -193,5 +204,30 @@ To view the list of job offers registered within the community, you need to type
 ![jobs - jobs category](/docs/images/conversation/jobs/jobs_job_category.png)
 
 ![jobs - jobs category selected](/docs/images/conversation/jobs/jobs_job_category_selected.png)
+
+[Go to index ↑](#index)
+
+## User management
+### Set user role
+
+This command can only be used by a user with an administrator role (Telegram), through which the role specified in the command itself can be assigned to a user.
+User role assignment can be done in two ways:
+- specifying the name of the user set on Telegram and the role you want to assign to the user;
+- by replying to a message from the user, specifying only the role you want to assign to it.
+
+Examples:
+- Set the role "Administrator" to the user with the command:
+
+`/set_user_role @username Administrator`
+
+![set_user_role - with username](/docs/images/commands/set_user_role/set_user_role_with_username.png)
+
+
+- Set the role "Administrator" to the user replying to the user's message with the command:
+
+`/set_user_role Administrator`
+
+![set_user_role - without username](/docs/images/commands/set_user_role/set_user_role_without_username.png)
+
 
 [Go to index ↑](#index)
