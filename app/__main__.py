@@ -7,6 +7,7 @@ from handlers.command.faq import faq
 from handlers.command.contacts import contacts
 from handlers.command.rules import rules
 from handlers.command.slides import slides
+from handlers.command.set_user_role import set_user_role
 from handlers.conversation.create_job.handler import create_job_handler
 from handlers.conversation.jobs.handler import jobs_handler
 from handlers.message.unknown import unknown
@@ -51,6 +52,9 @@ if __name__ == '__main__':
 
     rules_handler = CommandHandler('rules', rules)
     application.add_handler(rules_handler)
+    
+    set_user_role_handler = CommandHandler('set_user_role', set_user_role)
+    application.add_handler(set_user_role_handler)
     
     slides_handler = CommandHandler('slides', slides)
     application.add_handler(slides_handler)
