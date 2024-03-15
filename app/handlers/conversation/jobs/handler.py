@@ -7,7 +7,6 @@ from telegram.ext import (CallbackQueryHandler, CommandHandler,
                           ContextTypes, ConversationHandler, 
                           MessageHandler, filters)
 from telegram.constants import ParseMode
-from re import findall
 from utils.utils import close_inline_keyboard, create_inline_keyboard
 
 
