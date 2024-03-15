@@ -1,6 +1,6 @@
 from dependencies.db import SessionLocal
 from models.user.user import User
-from models.user.crud.retrieve import retrieve_user
+from models.user.crud.retrieve import retrieve_user_by_telegram_id
 from uuid import UUID
 import telegram
 
@@ -8,7 +8,7 @@ import telegram
 async def save_user_info(telegram_user: telegram.User) -> User | None:
 
     # Check user existance
-    db_user = await retrieve_user(telegram_user.id)
+    db_user = await retrieve_user_by_telegram_id(telegram_user.id)
 
     # If the user already exists, then return
     if db_user:
