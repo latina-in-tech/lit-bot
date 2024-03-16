@@ -58,7 +58,12 @@ category_ids_filter_pattern = f'^({'|'.join(job_categories)})$'
 
 async def create_job(update: Update, context: ContextTypes.DEFAULT_TYPE):  
     
-    await update.message.reply_text('Seleziona la tipologia di contratto \U0001F4DD',
+    message: str = f'Ciao {update.effective_user.first_name}! \U0001F44B\n' + \
+                   'Stai creando una nuova offerta di lavoro.\n' + \
+                   'Digita il comando /cancel per annullare l\'operazione.\n\n' + \
+                   'Seleziona la tipologia di contratto \U0001F4DD'
+    
+    await update.message.reply_text(text=message,
                                     reply_markup=contract_types_reply_keyboard)
 
     return CreateJob.CONTRACT_TYPE
