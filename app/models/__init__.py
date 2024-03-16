@@ -4,7 +4,7 @@ from models.job.job import Job
 from models.job_category.job_category import JobCategory
 from models.user.user import User
 from models.user_role.user_role import UserRole
-from sqlalchemy import Text, event, Connection, text
+from sqlalchemy import Text, event as sa_event, Connection, text
 
  
 CONTRACT_TYPES: list = [
@@ -34,7 +34,7 @@ USER_ROLES: list = [
 ]
 
 
-@event.listens_for(ContractType.__table__, 'after_create')
+@sa_event.listens_for(ContractType.__table__, 'after_create')
 def seed_contract_type_table(target, connection: Connection, **kw):
 
     for item in CONTRACT_TYPES:
@@ -42,7 +42,7 @@ def seed_contract_type_table(target, connection: Connection, **kw):
         connection.execute(sql_statement)
     
 
-@event.listens_for(JobCategory.__table__, 'after_create')
+@sa_event.listens_for(JobCategory.__table__, 'after_create')
 def seed_job_category_table(target, connection: Connection, **kw):
 
     for item in JOB_CATEGORIES:
@@ -50,7 +50,7 @@ def seed_job_category_table(target, connection: Connection, **kw):
         connection.execute(sql_statement)
 
 
-@event.listens_for(UserRole.__table__, 'after_create')
+@sa_event.listens_for(UserRole.__table__, 'after_create')
 def seed_user_roles_table(target, connection: Connection, **kw):
 
     for item in USER_ROLES:
