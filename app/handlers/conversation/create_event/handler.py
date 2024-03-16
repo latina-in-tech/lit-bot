@@ -3,6 +3,7 @@ from enum import Enum
 from telegram import ReplyKeyboardRemove, Update
 from telegram.constants import ParseMode
 from telegram.ext import ContextTypes, CommandHandler, ConversationHandler, filters, MessageHandler
+from models.user.crud.retrieve import user_is_administrator
 import models.event.crud.create
 
 
@@ -25,6 +26,10 @@ events_data: dict = {}
 
 
 async def create_event(update: Update, context: ContextTypes.DEFAULT_TYPE):  
+    
+    if not await user_is_administrator(update.effective_user.id):
+        await update.message.reply_text('\U0001F512 Non sei abilitato a compiere quest\'azione!')
+        return 
     
     message: str = f'Ciao {update.effective_user.first_name}! \U0001F44B\n' + \
                    'Stai creando un nuovo evento.\n' + \
