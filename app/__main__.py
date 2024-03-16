@@ -8,6 +8,7 @@ from handlers.command.contacts import contacts
 from handlers.command.rules import rules
 from handlers.command.slides import slides
 from handlers.command.set_user_role import set_user_role
+from handlers.conversation.create_event.handler import create_event_handler
 from handlers.conversation.create_job.handler import create_job_handler
 from handlers.conversation.jobs.handler import jobs_handler
 from handlers.message.unknown import unknown
@@ -61,7 +62,10 @@ if __name__ == '__main__':
 
     create_job_handler = ConversationHandler(**create_job_handler)
     application.add_handler(create_job_handler)
-    
+
+    create_event_handler = ConversationHandler(**create_event_handler)
+    application.add_handler(create_event_handler)
+
     unknown_handler = MessageHandler(filters.COMMAND, unknown)
     application.add_handler(unknown_handler)
 
