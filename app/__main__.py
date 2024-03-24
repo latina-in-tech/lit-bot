@@ -1,5 +1,6 @@
 from collections import OrderedDict
 from dotenv import dotenv_values
+from handlers.command.get_user_role import get_user_role
 from handlers.chat_member.chat_member import on_chat_member_update
 from handlers.command.start import start
 from handlers.command.events import events
@@ -64,10 +65,15 @@ if __name__ == '__main__':
     faq_handler = CommandHandler(command='faq',
                                  callback=faq)
     application.add_handler(faq_handler)
+
+    get_user_role_handler = CommandHandler(command='get_user_role',
+                                           callback=get_user_role,
+                                           filters=filters.ChatType.PRIVATE)
+    application.add_handler(get_user_role_handler)
     
     jobs_handler = ConversationHandler(**jobs_handler)
     application.add_handler(jobs_handler)
-    
+
     rules_handler = CommandHandler(command='rules', 
                                    callback=rules)
     application.add_handler(rules_handler)
