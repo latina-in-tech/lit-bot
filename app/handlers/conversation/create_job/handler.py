@@ -239,7 +239,8 @@ create_job_handler: dict = {
     'entry_points': [
         CommandHandler(
             command='create_job', 
-            callback=create_job
+            callback=create_job,
+            filters=filters.ChatType.PRIVATE
             )
     ],
     'states': {

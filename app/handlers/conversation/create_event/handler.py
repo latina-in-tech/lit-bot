@@ -193,7 +193,8 @@ create_event_handler: dict = {
     'entry_points': [
         CommandHandler(
             command='create_event', 
-            callback=create_event
+            callback=create_event,
+            filters=filters.ChatType.PRIVATE
             )
     ],
     'states': {
