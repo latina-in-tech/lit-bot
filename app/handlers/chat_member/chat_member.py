@@ -2,7 +2,7 @@ from datetime import datetime
 from models.user.crud.update import update_user
 from models.user.crud.retrieve import retrieve_user_by_telegram_id
 from telegram import ChatMember, ChatMemberUpdated, Update
-from telegram.ext import ChatMemberHandler, ContextTypes
+from telegram.ext import ContextTypes
 
 
 
