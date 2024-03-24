@@ -22,4 +22,4 @@ class User(Base):
     updated_at: Mapped[datetime] = mapped_column(nullable=True)
     deleted_at: Mapped[datetime] = mapped_column(nullable=True)
 
-    user_role = relationship('UserRole', back_populates='users')
+    user_role = relationship('UserRole', back_populates='users', lazy='joined')
