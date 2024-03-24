@@ -1,6 +1,6 @@
 from models.event.crud.retrieve import retrieve_events
 from datetime import datetime
-from telegram import Update
+from telegram import LinkPreviewOptions, Update
 from telegram.ext import ContextTypes
 from telegram.constants import ParseMode
 
@@ -40,9 +40,11 @@ async def events(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # Compose the list of events
         for i, event in enumerate(events_list):
             message += f'{i + 1}. <a href="{event.link}">{event.name}</a> - ' \
-                    f'{datetime.strftime(event.date, '%d/%m/%Y %H:%M:%S')}\n'
+                       f'{datetime.strftime(event.date, '%d/%m/%Y')}\n'
                 
         # Send the message to the user
-        await update.message.reply_text(text=message, parse_mode=ParseMode.HTML)
+        await update.message.reply_text(text=message, 
+                                        parse_mode=ParseMode.HTML,
+                                        link_preview_options=LinkPreviewOptions(is_disabled=True))
     else:
         await update.message.reply_text(text='Nessun evento trovato!')
