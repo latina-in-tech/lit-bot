@@ -8,25 +8,26 @@
 - [How to use](#how-to-use)
 
 ## Introduction
-The LatinaInTech (aka LiT) bot is the official bot of the Telegram group of the community of the same name.<br>
-The idea of having a bot to offer group users a series of additional features to the UX is an idea that espouses the philosophy of the community, that of being a point of reference for enthusiasts of the tech world of the province (and not).
+The LatinaInTech (aka LiT) bot is the official bot of the Telegram group of the homonymous community.<br>
+The idea of having a bot to offer group users a series of additional features to the UX is something that espouses the philosophy of the community, that of being a point of reference for enthusiasts of the tech world of the province (and not).
 
 [Go to index ↑](#index)
 
 ## Current features
 At the moment, the features implemented in the bot are:
 
-### Events:
+### Events
 - [view community events](#view-community-events)
 
-### Jobs:
+### Jobs
 - [creation of a new job offer](#creation-of-a-new-job-offer)
 - [view job offers registered by community users](#view-job-offers-registered-by-community-users)
 
-### User management:
+### User management
+- get user role
 - [set user role](#set-user-role)
 
-### General:
+### General
 - download slides templates for lightining talks
 - view community contacts
 - view bot commands
@@ -85,7 +86,7 @@ To proceed with completing this step, use the command:
 python -m virtualenv .\venv
 ```
 
-Once the creation of the virtual environment of the application (hereinafter _venv_) has been completed, you can proceed with its activation, using the command:
+Once the creation of the virtual environment of the application (hereinafter _venv_) has been completed, you can proceed with its activation, using the command (for Windows):
 
 ```console
 .\venv\Scripts\activate
@@ -106,7 +107,7 @@ BOT_TOKEN=<api_token>
 
 SA_DB_DIALECT=sqlite
 SA_DB_DRIVER=pysqlite
-SA_DB_FILEPATH=db.sqlite
+SA_DB_FILEPATH=database/db.sqlite
 ``` 
 
 Once the .env file has been created, and the variables have been correctly valued, the application is ready to be used, running the command:
