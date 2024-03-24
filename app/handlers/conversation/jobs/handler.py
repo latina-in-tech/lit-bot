@@ -2,7 +2,7 @@ from enum import Enum
 from models.job.job import Job
 from models.job.crud.retrieve import (retrieve_job_categories_with_jobs_count, retrieve_jobs, 
                                       retrieve_jobs_by_category, retrieve_job_category_pattern)
-from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
+from telegram import LinkPreviewOptions, Update, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 from telegram.ext import (CallbackQueryHandler, CommandHandler, 
                           ContextTypes, ConversationHandler, 
                           MessageHandler, filters)
@@ -93,7 +93,10 @@ async def handle_job_category(update: Update, context: ContextTypes.DEFAULT_TYPE
         [InlineKeyboardButton(text='\U000025C0 Indietro', callback_data='go_back')]
     ])
     
-    await query.edit_message_text(text=text, reply_markup=keyboard, parse_mode=ParseMode.HTML)
+    await query.edit_message_text(text=text, 
+                                  reply_markup=keyboard, 
+                                  parse_mode=ParseMode.HTML,
+                                  link_preview_options=LinkPreviewOptions(is_disabled=True))
 
     return NavigateJobs.GO_BACK
 
