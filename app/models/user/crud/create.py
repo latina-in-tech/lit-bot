@@ -1,6 +1,8 @@
+from datetime import datetime
 from dependencies.db import SessionLocal
 from models.user.user import User
 from models.user.crud.retrieve import retrieve_user_by_telegram_id
+from models.user.crud.update import update_user
 from uuid import UUID
 import telegram
 
@@ -10,8 +12,16 @@ async def save_user_info(telegram_user: telegram.User) -> User | None:
     # Check user existance
     db_user = await retrieve_user_by_telegram_id(telegram_user.id)
 
-    # If the user already exists, then return
-    if db_user:
+    # If the user already exists and it didn't block the bot
+    if db_user and db_user.deleted_at is None:
+        return None
+    
+    # If the user already exists and it did block the bot
+    elif db_user and db_user.deleted_at is not None:
+        
+        # Update the updated_at info (the user started the bot again)
+        db_user.updated_at = datetime.now()
+        await update_user(db_user)
         return None
     
     # Extract user's info to add in the users' db table
