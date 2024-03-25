@@ -34,6 +34,7 @@ async def create_job(job_data: dict) -> dict | None:
                 'Tipologia di contratto': inserted_job.contract_type.name,
                 'Ambito': inserted_job.job_category.name,
                 'Posizione ricercata': inserted_job.position,
+                'Descrizione': inserted_job.description,
                 'Link dell\'offerta': inserted_job.link if inserted_job.link is not None else 'Non disponibile',
                 'Compenso (annuo o totale)': f'€ {inserted_job.ral}' if inserted_job.ral is not None else 'Non disponibile'
             }
