@@ -8,6 +8,7 @@ from telegram.ext import (CallbackQueryHandler, CommandHandler,
                           MessageHandler, filters)
 from telegram.constants import ParseMode
 from utils.utils import close_inline_keyboard, create_inline_keyboard
+from models.user.crud.retrieve import retrieve_user_by_telegram_id
 
 
 HELP_MESSAGE: str = '''\U00002753 <b>Guida all'utilizzo del comando /jobs</b>
@@ -78,14 +79,25 @@ async def handle_job_category(update: Update, context: ContextTypes.DEFAULT_TYPE
     await query.answer()
 
     job_category_name = query.data
-    text = f'Lista di lavori per la categoria "<i>{job_category_name}</i>":\n'
+    message = f'Lista di lavori per la categoria "<i>{job_category_name}</i>":\n'
 
     # Get the list of jobs by category name
     jobs_list: list = await retrieve_jobs_by_category(job_category_name=job_category_name)
     
     # Compose the list of jobs
     for i, job in enumerate(jobs_list):
-        text += f'{i + 1}. <a href="{job.link}">{job.position}</a>{f' - RAL: € {job.ral:,}' if job.ral else ''}\n'
+        
+        # Check if the RAL is not null
+        ral = f'Compenso: € {job.ral:,}' if job.ral else None
+        
+        # If the RAL is null, then get the username of the user who created the job offer
+        if not ral:
+            user = await retrieve_user_by_telegram_id(telegram_id=job.created_by)
+            info = f'Info: @{user.username}'
+        else:
+            info = ral
+        
+        message += f'{i + 1}. <a href="{job.link}">{job.position}</a> - {info}\n'
 
     # Specify a callback_data is mandatory, otherwise the following error will be raised:
     # telegram.error.BadRequest: Can't parse inline keyboard button: text buttons are unallowed in the inline keyboard
@@ -93,7 +105,7 @@ async def handle_job_category(update: Update, context: ContextTypes.DEFAULT_TYPE
         [InlineKeyboardButton(text='\U000025C0 Indietro', callback_data='go_back')]
     ])
     
-    await query.edit_message_text(text=text, 
+    await query.edit_message_text(text=message, 
                                   reply_markup=keyboard, 
                                   parse_mode=ParseMode.HTML,
                                   link_preview_options=LinkPreviewOptions(is_disabled=True))
