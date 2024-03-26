@@ -8,6 +8,9 @@ Table events {
     name string [not null]
     description string
     date datetime [not null]
+    start_time string [not null]
+    start_end string [not null]
+    location string [not null]
     link string [not null]
     created_by int [not null, note: 'Telegram User ID of the user who created the event']
     created_at datetime [not null, default: `now()`]
@@ -18,7 +21,7 @@ Table events {
 Table job_categories {
     id int [primary key, not null, unique, increment]
     name string [not null, unique]
-    Note: 'Back.end, Front-end, Machine Learning & AI'
+    Note: 'Back-end, Front-end, Machine Learning & AI'
 }
 
 Table contract_types {
