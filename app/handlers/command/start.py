@@ -1,12 +1,19 @@
 from handlers.command.cmds import COMMANDS_LIST
-from telegram import Update, BotCommand, MenuButton, MenuButtonCommands
+from telegram import ChatMember, Update, BotCommand, MenuButton, MenuButtonCommands
 from telegram.ext import ContextTypes
 from telegram.constants import ParseMode
 from models.user.crud.create import save_user_info
 
 
+# Chat ID of the group chat (General topic)
+GENERAL_CHAT_ID: int = -1001847839591
+
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
+    user_commands: list = []
+    admin_commands: list = []
+    bot_commands: list[BotCommand] = []
 
     # Get the user who sent the /start command
     user = update.effective_user
@@ -19,10 +26,38 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # Send start message
     await update.message.reply_text(text=message, parse_mode=ParseMode.HTML)
+    
+    chat_member = await context.bot.get_chat_member(chat_id=GENERAL_CHAT_ID, 
+                                                    user_id=update.effective_user.id)
 
-    # Get the list of available commands from UDF commands
-    bot_commands: list[BotCommand] = [BotCommand(command_name, command_description) 
-                                      for command_name, command_description in COMMANDS_LIST.items()]
+    # Compose the text to show to the user
+    for command in COMMANDS_LIST:
+        if not command['requires_admin']:
+            user_commands.append(command)
+        
+        admin_commands.append(command)
+
+    # Compose the text to show to the user
+    for command in COMMANDS_LIST:
+        if not command['requires_admin']:
+            user_commands.append(command)
+        
+        admin_commands.append(command)
+
+    if chat_member.status == ChatMember.ADMINISTRATOR:
+
+        for command in admin_commands:
+            bot_command = BotCommand(command=command['name'], 
+                                     description=command['description'])
+            
+            bot_commands.append(bot_command)
+
+    else:
+        for command in user_commands:
+            bot_command = BotCommand(command=command['name'], 
+                                     description=command['description'])
+            
+            bot_commands.append(bot_command)
 
     # Set list of commands to the bot
     await context.bot.set_my_commands(commands=bot_commands)
