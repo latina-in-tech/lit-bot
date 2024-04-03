@@ -19,7 +19,7 @@ def retrieve_contract_types() -> list[ContractType]:
         return query_result if query_result else None
     
 
-async def retrieve_contract_type_id_by_name(contract_name: str) -> UUID:
+async def retrieve_contract_type_id_by_name(contract_type_name: str) -> UUID:
 
     # Initialize the db_session
     # It closes automatically at the end of the "with" context manager
@@ -27,7 +27,7 @@ async def retrieve_contract_type_id_by_name(contract_name: str) -> UUID:
     
         # Get the respective contract_type_id by its name
         sql_statement: Select = select(ContractType.id) \
-                                .where(ContractType.name == contract_name)
+                                .where(ContractType.name == contract_type_name)
         
         contract_type_id: int = db_session.scalar(sql_statement)
         
