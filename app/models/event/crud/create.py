@@ -33,12 +33,4 @@ async def create_event(event_data: dict) -> Event | None:
             # record with all information filled up
             inserted_event = db_session.get(Event, event_id)
 
-            event_info = {
-                'Nome': inserted_event.name,
-                'Location': inserted_event.location,
-                'Data': inserted_event.date.strftime('%d/%m/%Y'),
-                'Ora': f'{inserted_event.start_time} - {inserted_event.end_time}',
-                'Link': inserted_event.link
-            }
-
-            return event_info
+            return inserted_event
