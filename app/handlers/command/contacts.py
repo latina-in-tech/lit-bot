@@ -1,13 +1,13 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ParseMode
-from utils.constants import EMOJIS
+from utils.constants import Emojis
 
 
 LINKS: dict = {
-    f'{EMOJIS.up_right_arrow} Telegram': 'https://t.me/+UnoCoBSIPtE1OTNk',
-    f'{EMOJIS.construction_worker} LinkedIn': 'https://www.linkedin.com/company/latina-in-tech/',
-    f'{EMOJIS.globe_with_meridians} GitHub': 'https://latina-in-tech.github.io/'
+    f'{Emojis.up_right_arrow} Telegram': 'https://t.me/+UnoCoBSIPtE1OTNk',
+    f'{Emojis.construction_worker} LinkedIn': 'https://www.linkedin.com/company/latina-in-tech/',
+    f'{Emojis.globe_with_meridians} GitHub': 'https://latina-in-tech.github.io/'
 }
 
 
