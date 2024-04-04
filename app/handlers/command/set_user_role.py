@@ -6,17 +6,13 @@ from re import findall
 from telegram import Update, ChatMember
 from telegram.ext import ContextTypes
 from telegram.constants import ParseMode
-from utils.constants import Emoji
-
-
-# Chat ID of the group chat (General topic)
-GENERAL_CHAT_ID: int = -1001847839591
+from utils.constants import ChatId, Emoji
 
 
 async def set_user_role(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     # Get the user of a specified chat to check its status (if it has the right to invoke the command)
-    chat_member = await context.bot.get_chat_member(chat_id=GENERAL_CHAT_ID, 
+    chat_member = await context.bot.get_chat_member(chat_id=ChatId.GENERAL, 
                                                     user_id=update.effective_user.id)
     
     # If the user is not an Administrator
@@ -51,11 +47,6 @@ async def set_user_role(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if username:
             
             # Get the Telegram ID of the User
-            # with SessionLocal() as db_session:
-            #     sql_statement: Select = select(User.telegram_id) \
-            #                             .where(User.username == username)
-                
-            #     user_telegram_id = result if (result:=db_session.scalar(sql_statement)) else None
             user_telegram_id: int = user.telegram_id if (user:= await retrieve_user_by_username(username=username)) else None
             
             # If the user_telegram_id is not found
