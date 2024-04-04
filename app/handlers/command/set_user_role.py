@@ -6,6 +6,7 @@ from re import findall
 from telegram import Update, ChatMember
 from telegram.ext import ContextTypes
 from telegram.constants import ParseMode
+from utils.constants import EMOJIS
 
 
 # Chat ID of the group chat (General topic)
@@ -20,7 +21,7 @@ async def set_user_role(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     # If the user is not an Administrator
     if not chat_member.status == ChatMember.ADMINISTRATOR:
-        await update.message.reply_text('\U0001F512 Non sei abilitato a compiere quest\'azione!')
+        await update.message.reply_text(f'{EMOJIS.locked} Non sei abilitato a compiere quest\'azione!')
         return 
     
     # Variables initialization
@@ -59,13 +60,13 @@ async def set_user_role(update: Update, context: ContextTypes.DEFAULT_TYPE):
             
             # If the user_telegram_id is not found
             if not user_telegram_id:
-                await update.message.reply_text('\U000026A0 Utente non trovato!')
+                await update.message.reply_text(f'{EMOJIS.warning} Utente non trovato!')
                 return
         else:
-            await update.message.reply_text('\U000026A0 Username non corretto!')
+            await update.message.reply_text(f'{EMOJIS.warning} Username non corretto!')
             return
     else:
-        await update.message.reply_text(text='\U000026A0 Parametri del comando non corretti.')
+        await update.message.reply_text(f'{EMOJIS.warning} Parametri del comando non corretti.')
         return
     
 
@@ -86,13 +87,15 @@ async def set_user_role(update: Update, context: ContextTypes.DEFAULT_TYPE):
             
             # Updated the user and inform about the update
             if await update_user(user):
-                message = f'L\'utente @{username} ({user_telegram_id}) ha ora il ruolo di <b>{user_role_name}</b> \U00002705'
+                message = f'L\'utente @{username} ({user_telegram_id})' + \
+                          f'ha ora il ruolo di <b>{user_role_name}</b> {EMOJIS.check_mark_button}'
+                
                 await update.message.reply_text(text=message, parse_mode=ParseMode.HTML)
             else:
-                await update.message.reply_text(text='\U0000274C Errore durante l\'aggiornamento del ruolo dell\'utente.')
+                await update.message.reply_text(text=f'{EMOJIS.cross_mark} Errore durante l\'aggiornamento del ruolo dell\'utente.')
         else:
-            await update.message.reply_text(text='\U000026A0 Ruolo dell\'utente non corretto!')
+            await update.message.reply_text(text=f'{EMOJIS.warning} Ruolo dell\'utente non corretto!')
             return
     else:
-        await update.message.reply_text(text='\U000026A0 Utente non trovato!')
+        await update.message.reply_text(text=f'{EMOJIS.warning} Utente non trovato!')
         return
