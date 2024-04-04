@@ -4,16 +4,16 @@ from telegram import Update, ChatMember
 from telegram.ext import ContextTypes
 from telegram.constants import ParseMode
 from utils.constants import ChatId, Emoji
+from utils.utils import user_is_group_administrator
 
 
 async def get_user_role(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
-    # Get the user of a specified chat to check its status (if it has the right to invoke the command)
-    chat_member = await context.bot.get_chat_member(chat_id=ChatId.GENERAL, 
-                                                    user_id=update.effective_user.id)
-    
-    # If the user is not an Administrator
-    if not chat_member.status == ChatMember.ADMINISTRATOR:
+    # If the user is not an Administrator of the Group (GENERAL Chat Id is used)
+    if not user_is_group_administrator(bot=context.bot,
+                                       chat_id=ChatId.GENERAL,
+                                       user_id=update.effective_user.id):
+        
         await update.message.reply_text(f'{Emoji.LOCKED} Non sei abilitato a compiere quest\'azione!')
         return 
     
