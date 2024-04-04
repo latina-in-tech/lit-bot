@@ -1,7 +1,8 @@
+from models.user.crud.create import save_user_info
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ParseMode
-from models.user.crud.create import save_user_info
+from utils.constants import Emoji
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -10,8 +11,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     
     # Update the start message
-    message: str = f'Ciao {user.full_name}! \U0001F44B\n' + \
-                    'Sono il bot del gruppo Latina In Tech \U0001F916\n' + \
+    message: str = f'Ciao {user.full_name}! {Emoji.WAVING_HAND} \n' + \
+                   f'Sono il bot del gruppo Latina In Tech {Emoji.ROBOT} \n' + \
                     'Utilizza il comando /cmds per visualizzare la lista dei comandi disponibili.'
 
 
