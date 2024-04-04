@@ -14,7 +14,7 @@ async def get_user_role(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     # If the user is not an Administrator
     if not chat_member.status == ChatMember.ADMINISTRATOR:
-        await update.message.reply_text(f'{Emoji.locked} Non sei abilitato a compiere quest\'azione!')
+        await update.message.reply_text(f'{Emoji.LOCKED} Non sei abilitato a compiere quest\'azione!')
         return 
     
     # Variables initialization
