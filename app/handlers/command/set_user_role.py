@@ -3,7 +3,7 @@ from models.user.crud.retrieve import retrieve_user_by_telegram_id, retrieve_use
 from models.user.crud.update import update_user
 from models.user_role.crud.retrieve import retrieve_user_role_by_name
 from re import findall
-from telegram import Update, ChatMember
+from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ParseMode
 from utils.constants import ChatId, Emoji
