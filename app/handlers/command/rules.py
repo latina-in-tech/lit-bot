@@ -1,16 +1,17 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ParseMode
+from utils.constants import Character, Emoji
 
 
-MESSAGE: str = '''
-\U0001F4D6 <b>Regolamento del Gruppo:</b>
-\U00002022 non e' ammesso alcun tipo di offesa diretta o indiretta verso un altro membro del gruppo \U0001F621
-\U00002022 l'unico tipo di flame ammesso e' quello diretto alle tecnologie \U0001F525
-\U00002022 utilizza i topics in maniera responsabile \U0001F37A
-\U00002022 per segnalare un comportamento scorretto o qualcos'altro degno di nota dello staff, rispondi al messaggio da segnalare con il tag @admin \U0001F46E
+MESSAGE: str = f'''
+{Emoji.OPEN_BOOK} <b>Regolamento del Gruppo:</b>
+{Character.CIRCLE} non e' ammesso alcun tipo di offesa diretta o indiretta verso un altro membro del gruppo {Emoji.ENRAGED_FACE}
+{Character.CIRCLE} l'unico tipo di flame ammesso e' quello diretto alle tecnologie {Emoji.FIRE}
+{Character.CIRCLE} utilizza i topics in maniera responsabile {Emoji.BEER_MUG}
+{Character.CIRCLE} per segnalare un comportamento scorretto o qualcos'altro degno di nota dello staff, rispondi al messaggio da segnalare con il tag @admin {Emoji.POLICE_OFFICER}
 
-Grazie e buona permanenza! \U0001F60A
+Grazie e buona permanenza! {Emoji.SMILING_FACE_WITH_SMILING_EYES}
 '''
 
 
