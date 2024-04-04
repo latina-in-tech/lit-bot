@@ -5,7 +5,6 @@ from telegram import ChatMember, ChatMemberUpdated, Update
 from telegram.ext import ContextTypes
 
 
-
 async def extract_update_info(chat_member_update: ChatMemberUpdated) -> tuple | None:
 
     # Variables initialization
@@ -33,20 +32,21 @@ async def extract_update_info(chat_member_update: ChatMemberUpdated) -> tuple | 
 
 async def on_chat_member_update(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
+    # Extract the info about the updated chat member
     was_member, is_member = await extract_update_info(update.my_chat_member)
 
+    # Get the Telegram user's id
     user_telegram_id: int = update.effective_user.id
 
+    # If the member was a member and it's not a member (anymore),
+    # it means that the user left the group, so flag it as deleted (soft-delete)
     if was_member and not is_member:
     
+        # Obtain the user from its id
         if(user:=await retrieve_user_by_telegram_id(user_telegram_id)):
             
+            # Update the deleted_at column
             user.deleted_at = datetime.now()
     
+            # Update the user's info
             await update_user(user=user)
-            
-    
-
-    
-
-    
