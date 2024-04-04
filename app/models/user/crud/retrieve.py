@@ -33,7 +33,7 @@ async def retrieve_user_by_username(username: str) -> User | None:
         return query_result if query_result else None
     
 
-async def user_is_administrator(user_telegram_id: int) -> bool | None:
+async def check_user_role(user_telegram_id: int, user_role: str | list) -> bool | None:
 
     # Initialize the db_session
     # It closes automatically at the end of the "with" context manager
@@ -43,5 +43,8 @@ async def user_is_administrator(user_telegram_id: int) -> bool | None:
                                 .where(User.telegram_id == user_telegram_id)
         
         user: User = db_session.scalar(sql_statement)
-        
-        return user.user_role.name == 'Administrator' if user else None
+
+        if isinstance(user_role, str):
+            return user.user_role.name == user_role if user else None
+        elif isinstance(user, list):
+            return user.user_role.name in user_role if user else None
