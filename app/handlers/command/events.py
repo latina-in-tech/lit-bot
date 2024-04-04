@@ -3,11 +3,11 @@ from datetime import datetime
 from telegram import LinkPreviewOptions, Update
 from telegram.ext import ContextTypes
 from telegram.constants import ParseMode
+from utils.constants import EMOJIS
 
 
-HELP_MESSAGE: str = '''\U00002753 <b>Guida all'utilizzo del comando /events</b>
-Visualizza la lista degli eventi della community in programma.
-'''
+HELP_MESSAGE: str = f'{EMOJIS.red_question_mark} <b>Guida all\'utilizzo del comando /events</b>\n' + \
+                     'Visualizza la lista degli eventi della community in programma.'
 
 
 async def events(update: Update, context: ContextTypes.DEFAULT_TYPE):
