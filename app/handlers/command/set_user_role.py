@@ -78,7 +78,7 @@ async def set_user_role(update: Update, context: ContextTypes.DEFAULT_TYPE):
             
             # Updated the user and inform about the update
             if await update_user(user):
-                message = f'L\'utente @{username} ({user_telegram_id})' + \
+                message = f'L\'utente @{username} ({user_telegram_id}) ' + \
                           f'ha ora il ruolo di <b>{user_role_name}</b> {Emoji.CHECK_MARK_BUTTON}'
                 
                 await update.message.reply_text(text=message, parse_mode=ParseMode.HTML)

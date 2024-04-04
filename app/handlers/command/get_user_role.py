@@ -59,7 +59,7 @@ async def get_user_role(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         user_role_name: str = user.user_role.name
 
-        message = f'L\'utente @{username} ({user_telegram_id})' + \
+        message = f'L\'utente @{username} ({user_telegram_id}) ' + \
                   f'ha il ruolo di <b>{user_role_name}</b> {Emoji.CHECK_MARK_BUTTON}'
         
         await update.message.reply_text(text=message, parse_mode=ParseMode.HTML)
