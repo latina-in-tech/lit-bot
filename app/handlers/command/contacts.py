@@ -1,12 +1,13 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ParseMode
+from utils.constants import EMOJIS
 
 
 LINKS: dict = {
-    '\U00002197 Telegram': 'https://t.me/+UnoCoBSIPtE1OTNk',
-    '\U0001F477 LinkedIn': 'https://www.linkedin.com/company/latina-in-tech/',
-    '\U0001F310 GitHub': 'https://latina-in-tech.github.io/'
+    f'{EMOJIS.up_right_arrow} Telegram': 'https://t.me/+UnoCoBSIPtE1OTNk',
+    f'{EMOJIS.construction_worker} LinkedIn': 'https://www.linkedin.com/company/latina-in-tech/',
+    f'{EMOJIS.globe_with_meridians} GitHub': 'https://latina-in-tech.github.io/'
 }
 
 
