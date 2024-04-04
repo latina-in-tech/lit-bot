@@ -6,14 +6,30 @@ from re import findall
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ParseMode
-from utils.constants import ChatId, Emoji
-from utils.utils import user_is_group_administrator
+from utils.constants import ChatId, Emoji, Character
+from utils.utils import is_user_group_administrator
+
+
+HELP_MESSAGE: str = f'{Emoji.RED_QUESTION_MARK} <b>Guida all\'utilizzo del comando /set_user_role</b>\n' + \
+                     'Imposta il ruolo di un utente che ha avviato almeno una volta il bot.\n\n' + \
+                     f'{Emoji.TECHNOLOGIST} <b>Utilizzo</b>\n' + \
+                     f'{Character.CIRCLE} fornendo username e ruolo: <code>/set_user_role [@username] [role]</code>\n' + \
+                     f'{Character.CIRCLE} rispondendo a un messaggio dell\'utente: <code>/set_user_role [role]</code>' 
 
 
 async def set_user_role(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    # If there is any argument in the context
+    if len(context.args) > 0:
+
+        # If the first context argument is "help"
+        if context.args[0] == 'help':
+            await update.message.reply_text(text=HELP_MESSAGE, parse_mode=ParseMode.HTML)
+
+            return
     
     # If the user is not an Administrator of the Group (GENERAL Chat Id is used)
-    if not user_is_group_administrator(bot=context.bot,
+    if not is_user_group_administrator(bot=context.bot,
                                        chat_id=ChatId.GENERAL,
                                        user_id=update.effective_user.id):
         
