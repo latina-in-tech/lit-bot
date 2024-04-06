@@ -2,7 +2,7 @@ from datetime import datetime, time, timezone
 from enum import Enum
 from telegram import ReplyKeyboardRemove, Update
 from telegram.constants import ParseMode
-from telegram.ext import ContextTypes, CommandHandler, ConversationHandler, filters, MessageHandler
+from telegram.ext import ApplicationHandlerStop, ContextTypes, CommandHandler, ConversationHandler, filters, MessageHandler
 from models.event.crud.delete import soft_delete_event_by_id
 from models.user.crud.retrieve import check_user_role
 from utils.constants import ChatId, Emoji, ThreadId
@@ -166,8 +166,7 @@ async def link(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         # Obtaining the hours and minutes of the event,
         # converting them to int in order to use the time class
-        event_start_time_info = event.start_time.split(':')
-        if len(event_start_time_info) > 1:
+        if len(event_start_time_info := event.start_time.split(':')) > 1:
             hour, minute = [int(n) for n in event_start_time_info]
         else:
             hour = int(event_start_time_info[0])
@@ -231,6 +230,11 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def unauthorized_commands(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     await update.message.reply_text(f'I comandi non sono utilizzabili durante questo processo {Emoji.CROSS_MARK}')
+
+    # Thanks to this raise, the update will not be processed
+    # by other handlers, avoid calling other functions when
+    # using the ConversationHandler
+    raise ApplicationHandlerStop()
 
 
 # Set the filter for the message handlers,
