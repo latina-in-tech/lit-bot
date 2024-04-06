@@ -1,17 +1,31 @@
 from enum import Enum
 from models.job.job import Job
-from models.job.crud.retrieve import (retrieve_job_categories_with_jobs_count, retrieve_jobs, 
-                                      retrieve_jobs_by_category, retrieve_job_category_pattern)
-from telegram import LinkPreviewOptions, Update, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
-from telegram.ext import (CallbackQueryHandler, CommandHandler, 
-                          ContextTypes, ConversationHandler, 
-                          MessageHandler, filters)
+from models.job.crud.retrieve import (retrieve_job_categories_with_jobs_count, 
+                                      retrieve_jobs, 
+                                      retrieve_jobs_by_category, 
+                                      retrieve_job_category_pattern)
+
+from telegram import (LinkPreviewOptions, 
+                      Update, 
+                      InlineKeyboardMarkup, 
+                      InlineKeyboardButton, 
+                      CallbackQuery)
+
+from telegram.ext import (ApplicationHandlerStop,
+                          CallbackQueryHandler, 
+                          CommandHandler, 
+                          ContextTypes, 
+                          ConversationHandler, 
+                          MessageHandler, 
+                          filters)
+
 from telegram.constants import ParseMode
+from utils.constants import Emoji
 from utils.utils import close_inline_keyboard, create_inline_keyboard
 from models.user.crud.retrieve import retrieve_user_by_telegram_id
 
 
-HELP_MESSAGE: str = '''\U00002753 <b>Guida all'utilizzo del comando /jobs</b>
+HELP_MESSAGE: str = f'''{Emoji.RED_QUESTION_MARK} <b>Guida all'utilizzo del comando /jobs</b>
 Visualizza la lista dei lavori proposti dai membri della community,
 suddivisi per categoria.'''
 
@@ -56,8 +70,8 @@ async def jobs(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
         jobs_count = len(jobs_list)
 
         # Set the text to display to the user
-        text = f'\U000025b6 Numero totale di lavori: {jobs_count}\n' + \
-                'Clicca su una categoria per visualizzare la lista dei lavori.\n'
+        text = f'{Emoji.PLAY_BUTTON} Numero totale di lavori: {jobs_count}\n' + \
+                'Premi una categoria per visualizzare la lista dei lavori.\n'
     
         # Send the message to the user
         await update.message.reply_text(text=text, 
@@ -67,7 +81,7 @@ async def jobs(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
         return NavigateJobs.JOB_CATEGORY
     
     else:
-        await update.message.reply_text(text='Nessun lavoro trovato!')
+        await update.message.reply_text(text=f'Nessun lavoro trovato {Emoji.PERSON_SHRUGGING}')
 
         return ConversationHandler.END
     
@@ -102,7 +116,7 @@ async def handle_job_category(update: Update, context: ContextTypes.DEFAULT_TYPE
     # Specify a callback_data is mandatory, otherwise the following error will be raised:
     # telegram.error.BadRequest: Can't parse inline keyboard button: text buttons are unallowed in the inline keyboard
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text='\U000025C0 Indietro', callback_data='go_back')]
+        [InlineKeyboardButton(text=f'{Emoji.REVERSE_BUTTON} Indietro', callback_data='go_back')]
     ])
     
     await query.edit_message_text(text=message, 
@@ -140,7 +154,7 @@ async def go_back(update: Update, context: ContextTypes.DEFAULT_TYPE):
         jobs_count = len(jobs_list)
 
         # Set the text to display to the user
-        text = f'\U000025b6 Numero totale di lavori: {jobs_count}\n' + \
+        text = f'{Emoji.PLAY_BUTTON} Numero totale di lavori: {jobs_count}\n' + \
                 'Clicca su una categoria per visualizzare la lista dei lavori.\n'
     
         # Send the message to the user
@@ -151,17 +165,19 @@ async def go_back(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return NavigateJobs.JOB_CATEGORY
     
     else:
-        await update.message.reply_text(text='Nessun lavoro trovato!')
+        await update.message.reply_text(text=f'Nessun lavoro trovato {Emoji.PERSON_SHRUGGING}')
 
         return ConversationHandler.END
     
 
 async def handle_unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
-    await update.message.reply_text(text='Scelta non valida!')
+    await update.message.reply_text(text='Scelta non valida!\n' + \
+                                         f'Premi sul pulsante "Chiudi {Emoji.CROSS_MARK}" per utilizzare ' + \
+                                          'gli altri comandi.')
     await update.message.delete()
     
-    return
+    raise ApplicationHandlerStop()
     
 
 jobs_handler = {
