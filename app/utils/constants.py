@@ -14,6 +14,11 @@ BOT_COMMANDS: list[dict] = [
         'requires_admin': False
     },
     {
+        'name': '/create_event', 
+        'description': 'Crea un nuovo evento', 
+        'requires_admin': True
+    },
+    {
         'name': '/create_job', 
         'description': 'Crea una nuova offerta di lavoro', 
         'requires_admin': False
@@ -46,7 +51,7 @@ BOT_COMMANDS: list[dict] = [
     {
         'name': '/set_user_role', 
         'description': 'Imposta il ruolo dell\'utente specificato', 
-        'requires_admin': False
+        'requires_admin': True
     },
     {
         'name': '/slides', 
@@ -69,19 +74,31 @@ class Character(StrEnum):
 class Emoji(StrEnum):
     BEER_MUG: str = '\U0001F37A'
     BOOKS: str = '\U0001F4DA'
+    CALENDAR: str = '\U0001F4C5'
     CHECK_MARK_BUTTON: str = '\U00002705'
     CONSTRUCTION_WORKER: str = '\U0001F477'
     CROSS_MARK: str = '\U0000274C'
+    EIGHT_O_CLOCK: str = '\U0001F557'
     ENRAGED_FACE: str = '\U0001F621'
+    EURO_BANKNOTE: str = '\U0001F4B6'
     FACE_WITH_TEARS_OF_JOY: str = '\U0001F602'
     FIRE: str = '\U0001F525'
     GLOBE_WITH_MERIDIANS: str = '\U0001F310'
     GRINNING_FACE_WITH_SMILING_EYES: str = '\U0001F604'
+    INPUT_LATIN_UPPERCASE: str = '\U0001F520'
     LOCKED: str = '\U0001F512'
+    MEMO: str = '\U0001F4DD'
+    ONE_O_CLOCK: str = '\U0001F550'
     OPEN_BOOK: str = '\U0001F4D6'
+    PAGE_FACING_UP: str = '\U0001F4C4'
+    PERSON_SHRUGGING: str = '\U0001F937'
+    PLAY_BUTTON: str = '\U000025B6'
     POLICE_OFFICER: str = '\U0001F46E'
+    PENCIL: str = '\U0000270F'
     RED_QUESTION_MARK: str = '\U00002753'
+    REVERSE_BUTTON: str = '\U000025C0'
     ROBOT: str = '\U0001F916'
+    ROUND_PUSHPIN: str = '\U0001F4CD'
     SMILING_FACE_WITH_SMILING_EYES: str = '\U0001F60A'
     TECHNOLOGIST: str = '\U0001F4BB'
     UP_RIGHT_ARROW: str = '\U00002197'
@@ -92,5 +109,12 @@ class Emoji(StrEnum):
 # ChatId Enum
 class ChatId(IntEnum):
     GENERAL: int = -1001847839591
+
+
+# ThreadId Enum
+class ThreadId(IntEnum):
+    GENERAL: int = 1
+    JOB: int = 23
+    EVENT: int = 24
 
 
