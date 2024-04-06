@@ -1,12 +1,48 @@
 from itertools import batched
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup
+from telegram import (BotCommand, 
+                      ChatMember, 
+                      InlineKeyboardButton, 
+                      InlineKeyboardMarkup, 
+                      MenuButton, 
+                      MenuButtonCommands, 
+                      ReplyKeyboardMarkup)
+
 from typing import Iterable
 from telegram import CallbackQuery, Update
-from telegram.ext import ContextTypes, ConversationHandler
-import logging
-import json
-import html
-import traceback
+from telegram.ext import (Application, 
+                          ContextTypes, 
+                          ConversationHandler, 
+                          ExtBot)
+
+from utils.constants import BOT_COMMANDS, Emoji
+
+
+async def post_init(application: Application):
+
+    bot_commands: list[BotCommand] = []
+        
+    # Getting the bot commands based on the user role in the group
+    commands = filter(lambda command: command['requires_admin'] == False, BOT_COMMANDS)
+    
+    # Compose the list of commands
+    for command in commands:
+        
+        bot_command = BotCommand(command=command['name'], 
+                                    description=command['description'])
+        
+        bot_commands.append(bot_command)
+
+    # Set list of commands to the bot
+    await application.bot.set_my_commands(commands=bot_commands)
+
+#     # Set menu button to show available bot commands
+    await application.bot.set_chat_menu_button(chat_id=None, 
+                                               menu_button=MenuButton(type=MenuButtonCommands.COMMANDS))
+    
+
+async def is_user_group_administrator(bot: ExtBot, chat_id: int, user_id: int) -> bool:
+    return await bot.get_chat_member(chat_id=chat_id, user_id=user_id) in [ChatMember.OWNER, 
+                                                                           ChatMember.ADMINISTRATOR]
 
 
 def create_inline_keyboard(name: str, 
@@ -23,7 +59,7 @@ def create_inline_keyboard(name: str,
     if has_close_button:
         inline_keyboard.append(
             [
-                InlineKeyboardButton(text='Chiudi \U0000274C', 
+                InlineKeyboardButton(text=f'Chiudi {Emoji.CROSS_MARK}', 
                                      callback_data=f'{name}_close_inline_keyboard')
             ])
 
@@ -49,33 +85,9 @@ def create_reply_keyboard(items: Iterable,
     
     # Add close button if not specified differently
     if has_close_button:
-        reply_markup_keyboard.append(['Chiudi \U0000274C'])
+        reply_markup_keyboard.append([f'Chiudi {Emoji.CROSS_MARK}'])
 
     return ReplyKeyboardMarkup(keyboard=reply_markup_keyboard,
                                resize_keyboard=True,
                                one_time_keyboard=True,
                                input_field_placeholder=input_field_placeholder)
-
-
-async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    
-    logging.error('Exception while handling an update:', exc_info=context.error)
-
-    # traceback.format_exception returns the usual python message about an exception, but as a
-    # list of strings rather than a single string, so we have to join them together.
-    tb_list = traceback.format_exception(None, context.error, context.error.__traceback__)
-    tb_string = ''.join(tb_list)
-
-    # Build the message with some markup and additional information about what happened.
-    # You might need to add some logic to deal with messages longer than the 4096 character limit.
-    update_str = update.to_dict() if isinstance(update, Update) else str(update)
-    message = (
-        'An exception was raised while handling an update\n'
-        f'<pre>update = {html.escape(json.dumps(update_str, indent=2, ensure_ascii=False))}'
-        '</pre>\n\n'
-        f'<pre>context.chat_data = {html.escape(str(context.chat_data))}</pre>\n\n'
-        f'<pre>context.user_data = {html.escape(str(context.user_data))}</pre>\n\n'
-        f'<pre>{html.escape(tb_string)}</pre>'
-    )
-
-    logging.error(message)

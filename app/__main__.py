@@ -13,11 +13,15 @@ from handlers.command.set_user_role import set_user_role
 from handlers.conversation.create_event.handler import create_event_handler
 from handlers.conversation.create_job.handler import create_job_handler
 from handlers.conversation.jobs.handler import jobs_handler
-from handlers.message.unknown import unknown
 from handlers.conversation.easter_egg.easter_egg import easter_egg_handler
+from handlers.error.error_handler import error_handler
 from telegram import Update
-from telegram.ext import ApplicationBuilder, CommandHandler, ConversationHandler, MessageHandler, filters, ChatMemberHandler
-from utils.utils import error_handler
+from telegram.ext import (ApplicationBuilder, 
+                          CommandHandler, 
+                          ConversationHandler, 
+                          filters, 
+                          ChatMemberHandler)
+from utils.utils import post_init
 import logging
 
 
@@ -33,11 +37,17 @@ BOT_TOKEN: str = ENV_VARS['BOT_TOKEN']
 
 if __name__ == '__main__':
     
-    application = ApplicationBuilder().token(BOT_TOKEN).build()
-    # application.add_error_handler(error_handler)
+    application = (
+        ApplicationBuilder()
+        .token(BOT_TOKEN)
+        .post_init(post_init=post_init)
+        # .post_stop(post_stop=post_stop)
+        .build())
+    
+    application.add_error_handler(error_handler)
     
     # With the filters=filters.ChatType.PRIVATE, we allow the user to invoke the command just with the bot chat,
-    # This mechanism is used to avoid the user to use this command in groups
+    # This mechanism is used to avoid the user to use this command in groups    
     start_handler = CommandHandler(command='start', 
                                    callback=start,
                                    filters=filters.ChatType.PRIVATE)
@@ -52,10 +62,10 @@ if __name__ == '__main__':
     application.add_handler(contacts_handler)
 
     create_job_handler = ConversationHandler(**create_job_handler)
-    application.add_handler(create_job_handler)
+    application.add_handler(create_job_handler, -1)
 
     create_event_handler = ConversationHandler(**create_event_handler)
-    application.add_handler(create_event_handler)
+    application.add_handler(create_event_handler, -1)
     
     events_handler = CommandHandler(command='events', 
                                     callback=events,
@@ -72,7 +82,7 @@ if __name__ == '__main__':
     application.add_handler(get_user_role_handler)
     
     jobs_handler = ConversationHandler(**jobs_handler)
-    application.add_handler(jobs_handler)
+    application.add_handler(jobs_handler, -1)
 
     rules_handler = CommandHandler(command='rules', 
                                    callback=rules)
@@ -88,10 +98,7 @@ if __name__ == '__main__':
     application.add_handler(slides_handler)
 
     ee_handler = ConversationHandler(**easter_egg_handler)
-    application.add_handler(ee_handler)
-
-    # unknown_handler = MessageHandler(filters.COMMAND, unknown)
-    # application.add_handler(unknown_handler)
+    application.add_handler(ee_handler, -1)
 
     # ChatMemberHandler (use chat_member_type=MY_CHAT_MEMBER to check when the user blocks/unblocks the bot)
     # In this case, we update the user info everytime we receive an update through this handler
