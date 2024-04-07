@@ -15,12 +15,15 @@ from handlers.conversation.create_job.handler import create_job_handler
 from handlers.conversation.jobs.handler import jobs_handler
 from handlers.conversation.easter_egg.easter_egg import easter_egg_handler
 from handlers.error.error_handler import error_handler
+from handlers.message.admin import admin
 from telegram import Update
 from telegram.ext import (ApplicationBuilder, 
                           CommandHandler, 
                           ConversationHandler, 
                           filters, 
-                          ChatMemberHandler)
+                          ChatMemberHandler,
+                          MessageHandler)
+
 from utils.utils import post_init
 import logging
 
@@ -52,6 +55,13 @@ if __name__ == '__main__':
                                    callback=start,
                                    filters=filters.ChatType.PRIVATE)
     application.add_handler(start_handler)
+
+    # The filter "filters.ChatType.GROUPS" makes sure that the callback
+    # is triggered just in groups or supergroups
+    admin_handler = MessageHandler(filters=(filters.Regex(r'@\badmin\b') & 
+                                            filters.ChatType.GROUPS), 
+                                   callback=admin)
+    application.add_handler(admin_handler)
     
     cmds_handler = CommandHandler(command='cmds', 
                                   callback=cmds)
