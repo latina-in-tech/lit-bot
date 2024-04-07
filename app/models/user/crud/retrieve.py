@@ -62,7 +62,8 @@ async def retrieve_users_by_role(role_name: str) -> list[User] | User:
         user_role = await retrieve_user_role_by_name(user_role_name=role_name)
 
         sql_statement: Select = select(User) \
-                                .where(User.role_id == user_role.id)
+                                .where(User.role_id == user_role.id) \
+                                .order_by(User.first_name)
         
         query_result: ScalarResult = db_session.scalars(sql_statement)
 
