@@ -56,7 +56,7 @@ async def get_user_role(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # If the username has the correct pattern
         if username:
                 
-            user_telegram_id: int = user.telegram_id if (user:= await retrieve_user_by_username(username=username)) else None
+            user_telegram_id: int = user.telegram_id if (user := await retrieve_user_by_username(username=username)) else None
             
             # If the user_telegram_id is not found
             if not user_telegram_id:

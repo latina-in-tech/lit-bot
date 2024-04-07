@@ -63,7 +63,7 @@ async def set_user_role(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if username:
             
             # Get the Telegram ID of the User
-            user_telegram_id: int = user.telegram_id if (user:= await retrieve_user_by_username(username=username)) else None
+            user_telegram_id: int = user.telegram_id if (user := await retrieve_user_by_username(username=username)) else None
             
             # If the user_telegram_id is not found
             if not user_telegram_id:
