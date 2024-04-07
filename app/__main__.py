@@ -87,8 +87,7 @@ if __name__ == '__main__':
     application.add_handler(faq_handler)
 
     get_user_role_handler = CommandHandler(command='get_user_role',
-                                           callback=get_user_role,
-                                           filters=filters.ChatType.PRIVATE)
+                                           callback=get_user_role)
     application.add_handler(get_user_role_handler)
     
     jobs_handler = ConversationHandler(**jobs_handler)
@@ -99,8 +98,7 @@ if __name__ == '__main__':
     application.add_handler(rules_handler)
     
     set_user_role_handler = CommandHandler(command='set_user_role', 
-                                           callback=set_user_role,
-                                           filters=filters.ChatType.PRIVATE)
+                                           callback=set_user_role)
     application.add_handler(set_user_role_handler)
     
     slides_handler = CommandHandler(command='slides', 
