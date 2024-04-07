@@ -2,16 +2,17 @@ from dependencies.db import SessionLocal
 from models.job.job import Job
 from models.job_category.job_category import JobCategory
 from sqlalchemy import func, Result, ScalarResult, Select, select
+from utils.constants import Emoji
 
 JOB_CATEGORIES_EMOJI: dict = {
-    'Back-end': '\U0001F310',
-    'Cybersecurity': '\U0001F510',
-    'DevOps & Cloud': '\U00002601',
-    'Front-end': '\U0001F4BB',
-    'Machine Learning & AI': '\U0001F916',
-    'Mobile': '\U0001F4F1',
-    'Quantum Computing': '\U0000269B',
-    'UX-UI': '\U0001F477'
+    'Back-end': Emoji.GLOBE_WITH_MERIDIANS,
+    'Cybersecurity': Emoji.LOCKED_WITH_KEY,
+    'DevOps & Cloud': Emoji.CLOUD,
+    'Front-end': Emoji.TECHNOLOGIST,
+    'Machine Learning & AI': Emoji.ROBOT,
+    'Mobile': Emoji.MOBILE_PHONE,
+    'Quantum Computing': Emoji.ATOM_SYMBOL,
+    'UX-UI': Emoji.CONSTRUCTION_WORKER
 }
 
 

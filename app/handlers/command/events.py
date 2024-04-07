@@ -35,7 +35,7 @@ async def events(update: Update, context: ContextTypes.DEFAULT_TYPE):
         events_count = len(events_list)
     
         # Set the text to display to the user
-        message = f'\U000025b6 Numero totale di eventi: {events_count}\n'
+        message = f'{Emoji.PLAY_BUTTON} Numero totale di eventi: {events_count}\n'
 
         # Compose the list of events
         for i, event in enumerate(events_list):

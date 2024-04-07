@@ -72,10 +72,12 @@ class Character(StrEnum):
 
 # Emoji Enum
 class Emoji(StrEnum):
+    ATOM_SYMBOL: str = '\U0000269B'
     BEER_MUG: str = '\U0001F37A'
     BOOKS: str = '\U0001F4DA'
     CALENDAR: str = '\U0001F4C5'
     CHECK_MARK_BUTTON: str = '\U00002705'
+    CLOUD: str = '\U00002601'
     CONSTRUCTION_WORKER: str = '\U0001F477'
     CROSS_MARK: str = '\U0000274C'
     EIGHT_O_CLOCK: str = '\U0001F557'
@@ -87,7 +89,9 @@ class Emoji(StrEnum):
     GRINNING_FACE_WITH_SMILING_EYES: str = '\U0001F604'
     INPUT_LATIN_UPPERCASE: str = '\U0001F520'
     LOCKED: str = '\U0001F512'
+    LOCKED_WITH_KEY: str = '\U0001F510'
     MEMO: str = '\U0001F4DD'
+    MOBILE_PHONE: str = '\U0001F4F1'
     ONE_O_CLOCK: str = '\U0001F550'
     OPEN_BOOK: str = '\U0001F4D6'
     PAGE_FACING_UP: str = '\U0001F4C4'
