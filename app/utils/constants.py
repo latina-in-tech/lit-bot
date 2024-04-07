@@ -92,6 +92,7 @@ class Emoji(StrEnum):
     PAGE_FACING_UP: str = '\U0001F4C4'
     PERSON_SHRUGGING: str = '\U0001F937'
     PLAY_BUTTON: str = '\U000025B6'
+    POLICE_CAR_LIGHT: str = '\U0001F6A8'
     POLICE_OFFICER: str = '\U0001F46E'
     PENCIL: str = '\U0000270F'
     RED_QUESTION_MARK: str = '\U00002753'
