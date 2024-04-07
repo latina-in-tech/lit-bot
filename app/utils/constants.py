@@ -57,11 +57,6 @@ BOT_COMMANDS: list[dict] = [
         'name': '/slides', 
         'description': 'Visualizza il link per scaricare i template delle slides per i talk della LiT', 
         'requires_admin': False
-    },
-    {
-        'name': '/start', 
-        'description': 'Avvia il bot', 
-        'requires_admin': False
     }
 ]
 
