@@ -12,7 +12,7 @@ async def retrieve_user_roles():
         sql_statement: Select = select(UserRole) \
                                 .order_by(UserRole.name)
         
-        return user_roles := db_session.scalars(sql_statement).all() if user_roles else None
+        return user_roles if(user_roles := db_session.scalars(sql_statement).all()) else None
     
 
 async def retrieve_user_role_by_name(user_role_name: str) -> UserRole | None:
