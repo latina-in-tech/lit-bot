@@ -57,6 +57,11 @@ BOT_COMMANDS: list[dict] = [
         'name': '/slides', 
         'description': 'Visualizza il link per scaricare i template delle slides per i talk della LiT', 
         'requires_admin': False
+    },
+    {
+        'name': '/staff', 
+        'description': 'Visualizza lo staff del gruppo Telegram della LiT', 
+        'requires_admin': False
     }
 ]
 
@@ -91,6 +96,7 @@ class Emoji(StrEnum):
     OPEN_BOOK: str = '\U0001F4D6'
     PAGE_FACING_UP: str = '\U0001F4C4'
     PERSON_SHRUGGING: str = '\U0001F937'
+    PERSON_WITH_CROWN: str = '\U0001FAC5'
     PLAY_BUTTON: str = '\U000025B6'
     POLICE_CAR_LIGHT: str = '\U0001F6A8'
     POLICE_OFFICER: str = '\U0001F46E'
