@@ -1,5 +1,6 @@
 from collections import OrderedDict
 from dotenv import dotenv_values
+from handlers.command.staff import staff
 from handlers.command.get_user_role import get_user_role
 from handlers.chat_member.chat_member import on_chat_member_update
 from handlers.command.start import start
@@ -104,6 +105,9 @@ if __name__ == '__main__':
     slides_handler = CommandHandler(command='slides', 
                                     callback=slides)
     application.add_handler(slides_handler)
+
+    staff_handler = CommandHandler('staff', staff)
+    application.add_handler(staff_handler)
 
     ee_handler = ConversationHandler(**easter_egg_handler)
     application.add_handler(ee_handler, -1)

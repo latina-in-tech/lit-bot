@@ -65,9 +65,5 @@ async def retrieve_users_by_role(role_name: str) -> list[User] | User:
                                 .where(User.role_id == user_role.id) \
                                 .order_by(User.first_name)
         
-        query_result: ScalarResult = db_session.scalars(sql_statement)
-
-        if query_result:
-            users = [user for user in query_result]
-
-        return users
+        
+        return users if (users := db_session.scalars(sql_statement).all()) else None
