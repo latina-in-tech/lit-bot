@@ -26,9 +26,9 @@ async def get_user_role(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
 
     # If the user is not an Administrator of the Group (GENERAL Chat Id is used)
-    if not is_user_group_administrator(bot=context.bot,
-                                       chat_id=ChatId.GENERAL,
-                                       user_id=update.effective_user.id):
+    if not await is_user_group_administrator(bot=context.bot,
+                                             chat_id=ChatId.GENERAL,
+                                             user_id=update.effective_user.id):
         
         await update.message.reply_text(f'{Emoji.LOCKED} Non sei abilitato a compiere quest\'azione!')
         return 
