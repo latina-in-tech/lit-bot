@@ -47,7 +47,7 @@ async def get_user_role(update: Update, context: ContextTypes.DEFAULT_TYPE):
         user_telegram_id = message_replied.from_user.id
         username = un if(un:=message_replied.from_user.username) else ''
     
-    # Else, two arguments are expected (@username and role)
+    # Else, one argument is expected (@username)
     elif command_args_count == 1:
         
         # Extract the required information
