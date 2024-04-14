@@ -41,8 +41,9 @@ async def post_init(application: Application):
     
 
 async def is_user_group_administrator(bot: ExtBot, chat_id: int, user_id: int) -> bool:
-    return await bot.get_chat_member(chat_id=chat_id, user_id=user_id) in [ChatMember.OWNER, 
-                                                                           ChatMember.ADMINISTRATOR]
+    chat_member = await bot.get_chat_member(chat_id=chat_id, user_id=user_id)
+    
+    return chat_member.status in [ChatMember.OWNER, ChatMember.ADMINISTRATOR]
 
 
 def create_inline_keyboard(name: str, 
