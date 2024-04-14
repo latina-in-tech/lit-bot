@@ -11,9 +11,9 @@ async def cmds(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message: str = f'{Emoji.TECHNOLOGIST} <b>Lista dei comandi disponibili:</b>\n'
     
     # Getting the group Administrator status of the user
-    user_is_group_administrator = is_user_group_administrator(bot=context.bot, 
-                                                              chat_id=ChatId.GENERAL,
-                                                              user_id=update.effective_chat.id)
+    user_is_group_administrator = await is_user_group_administrator(bot=context.bot, 
+                                                                    chat_id=ChatId.GENERAL,
+                                                                    user_id=update.effective_chat.id)
         
     # Getting the bot commands based on the user role in the group
     commands = (BOT_COMMANDS 
