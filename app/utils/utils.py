@@ -35,7 +35,7 @@ async def post_init(application: Application):
     # Set list of commands to the bot
     await application.bot.set_my_commands(commands=bot_commands)
 
-#     # Set menu button to show available bot commands
+    # Set menu button to show available bot commands
     await application.bot.set_chat_menu_button(chat_id=None, 
                                                menu_button=MenuButton(type=MenuButtonCommands.COMMANDS))
     
