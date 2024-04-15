@@ -4,7 +4,7 @@ from telegram import ReplyKeyboardRemove, Update
 from telegram.constants import ParseMode
 from telegram.ext import ApplicationHandlerStop, ContextTypes, CommandHandler, ConversationHandler, filters, MessageHandler
 from models.event.crud.delete import soft_delete_event_by_id
-from models.user.crud.retrieve import check_user_role
+from models.user.crud.retrieve import check_user_role, retrieve_user_by_telegram_id
 from utils.constants import ChatId, Emoji, ThreadId
 import models.event.crud.create
 
@@ -156,7 +156,7 @@ async def link(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # Set the event's link and created_by (id of the user)
     events_data['link'] = user_message
-    events_data['created_by'] = update.message.from_user.id
+    events_data['created_by'] = retrieve_user_by_telegram_id(telegram_id=update.effective_user.id)
     
     # Create the event
     event = await models.event.crud.create.create_event(event_data=events_data)
