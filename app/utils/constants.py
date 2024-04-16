@@ -44,6 +44,11 @@ BOT_COMMANDS: list[dict] = [
         'requires_admin': False
     },
     {
+        'name': '/memo', 
+        'description': 'Crea una memo', 
+        'requires_admin': False
+    },
+    {
         'name': '/rules', 
         'description': 'Visualizza le regole del gruppo', 
         'requires_admin': False
