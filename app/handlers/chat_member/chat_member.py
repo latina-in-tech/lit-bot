@@ -24,22 +24,27 @@ async def extract_update_info(chat_member_update: ChatMemberUpdated) -> tuple | 
     old_status, new_status = status
 
     # Set the variables according to what the user did
-    was_member = old_status == ChatMember.MEMBER and new_status == ChatMember.BANNED
-    is_member = old_status == ChatMember.BANNED and new_status == ChatMember.MEMBER
+    was_member = (old_status == ChatMember.MEMBER and new_status == ChatMember.BANNED) or \
+                 (old_status == ChatMember.MEMBER and new_status == ChatMember.LEFT)
+    
+    is_member = (old_status == ChatMember.BANNED and new_status == ChatMember.MEMBER) or \
+                (old_status == ChatMember.LEFT and new_status == ChatMember.MEMBER)
     
     return was_member, is_member
 
 
 async def on_chat_member_update(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
+    chat_member_update = chat_member if (chat_member := update.chat_member) else update.my_chat_member
+
     # Extract the info about the updated chat member
-    was_member, is_member = await extract_update_info(update.my_chat_member)
+    was_member, is_member = await extract_update_info(chat_member_update)
 
     # Get the Telegram user's id
     user_telegram_id: int = update.effective_user.id
 
     # If the member was a member and it's not a member (anymore),
-    # it means that the user left the group, so flag it as deleted (soft-delete)
+    # it means that the user left the group/banned the bot, so flag it as deleted (soft-delete)
     if was_member and not is_member:
     
         # Obtain the user from its id
