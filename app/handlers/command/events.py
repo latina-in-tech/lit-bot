@@ -47,4 +47,4 @@ async def events(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                         parse_mode=ParseMode.HTML,
                                         link_preview_options=LinkPreviewOptions(is_disabled=True))
     else:
-        await update.message.reply_text(text='Nessun evento trovato!')
+        await update.message.reply_text(text=f'Nessun evento trovato {Emoji.PERSON_SHRUGGING}')
