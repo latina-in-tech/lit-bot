@@ -156,7 +156,11 @@ async def link(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # Set the event's link and created_by (id of the user)
     events_data['link'] = user_message
-    events_data['created_by'] = retrieve_user_by_telegram_id(telegram_id=update.effective_user.id)
+
+    # Assign the user id of the user who created the event
+    events_data['created_by'] = user.id \
+                                if(user := await retrieve_user_by_telegram_id(telegram_id=update.effective_user.id)) \
+                                else None
     
     # Create the event
     event = await models.event.crud.create.create_event(event_data=events_data)
@@ -190,7 +194,7 @@ async def link(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         event_info: dict = {
             'Nome': event.name,
-            'Data': event.date,
+            'Data': datetime.strftime(event.date, '%d/%m/%Y'),
             'Ora': f'{event.start_time} - {event.end_time}',
             'Location': event.location,
             'Link': event.link
