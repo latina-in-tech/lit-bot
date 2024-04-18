@@ -1,7 +1,9 @@
 from models.base.base import Base
 from datetime import datetime
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from uuid import UUID, uuid4
+
 
 class Event(Base):
 
@@ -15,8 +17,10 @@ class Event(Base):
     end_time: Mapped[str] = mapped_column(nullable=False)
     location: Mapped[str] = mapped_column(nullable=False)
     link: Mapped[str] = mapped_column(nullable=False)
-    created_by: Mapped[int] = mapped_column(nullable=False)
+    created_by: Mapped[UUID] = mapped_column(ForeignKey('users.id'), nullable=False)
     created_at: Mapped[datetime] = mapped_column(nullable=False, default=datetime.now)
     updated_at: Mapped[datetime] = mapped_column(nullable=True)
     deleted_at: Mapped[datetime] = mapped_column(nullable=True)
+
+    user = relationship(argument='User', back_populates='events')
     

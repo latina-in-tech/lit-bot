@@ -16,11 +16,12 @@ class Job(Base):
     description: Mapped[str] = mapped_column(nullable=False)
     link: Mapped[str] = mapped_column(nullable=True)
     ral: Mapped[int] = mapped_column(nullable=True)
-    created_by: Mapped[int] = mapped_column(nullable=False)
+    created_by: Mapped[UUID] = mapped_column(ForeignKey('users.id'), nullable=False)
     created_at: Mapped[datetime] = mapped_column(nullable=False, default=datetime.now)
     updated_at: Mapped[datetime] = mapped_column(nullable=True)
     deleted_at: Mapped[datetime] = mapped_column(nullable=True)
 
     contract_type = relationship('ContractType', back_populates='jobs')
     job_category = relationship('JobCategory', back_populates='jobs')
+    user = relationship(argument='User', back_populates='jobs', lazy='joined')
     
