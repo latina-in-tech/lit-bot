@@ -28,7 +28,7 @@ async def retrieve_jobs() -> list[Job] | None:
                                    .order_by(Job.created_at.desc())
         
         # Execute the query and get the result
-        query_result: ScalarResult = db_session.scalars(select_statement).all()
+        query_result: ScalarResult = db_session.scalars(select_statement).unique().all()
 
         return query_result if query_result else None
     
@@ -89,7 +89,7 @@ async def retrieve_jobs_by_category(job_category_name: str) -> list[Job] | None:
         sql_statement: Select = select(Job) \
                                 .where(Job.category_id == job_category_id)
         
-        query_result: list = db_session.scalars(sql_statement).all()
+        query_result: list = db_session.scalars(sql_statement).unique().all()
 
         return query_result if query_result else None
     
