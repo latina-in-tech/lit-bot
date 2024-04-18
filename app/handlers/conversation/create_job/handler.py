@@ -200,7 +200,11 @@ async def ral(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # Set the job's link and created_by (id of the user)
     job_data['ral'] = user_message if user_message != 'n.a.' else None
-    job_data['created_by'] = retrieve_user_by_telegram_id(telegram_id=update.effective_user.id)
+
+    # Assign the user id of the user who created the job offer
+    job_data['created_by'] = user.id \
+                             if(user := await retrieve_user_by_telegram_id(telegram_id=update.effective_user.id)) \
+                             else None
 
     # Normalization of the data (contract_type_id and category_id strings (column "name") become ids)
     if await normalize_job(job_data):
