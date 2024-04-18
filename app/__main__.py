@@ -72,8 +72,9 @@ if __name__ == '__main__':
     # chat_join_request_handler = ChatJoinRequestHandler(callback=chat_join)
     # application.add_handler(chat_join_request_handler)
 
-    chat_join_request_query_handler = CallbackQueryHandler(callback=chat_join_callback)
-    application.add_handler(chat_join_request_query_handler)
+    # chat_join_request_query_handler = CallbackQueryHandler(callback=chat_join_callback,
+    #                                                        pattern=)
+    # application.add_handler(chat_join_request_query_handler)
     
     cmds_handler = CommandHandler(command='cmds', 
                                   callback=cmds)
