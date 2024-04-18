@@ -105,11 +105,7 @@ async def handle_job_category(update: Update, context: ContextTypes.DEFAULT_TYPE
         ral = f'Compenso: € {job.ral:,}' if job.ral else None
         
         # If the RAL is null, then get the username of the user who created the job offer
-        if not ral:
-            user = await retrieve_user_by_telegram_id(telegram_id=job.created_by)
-            info = f'Info: @{user.username}'
-        else:
-            info = ral
+        info = f'@{job.user.username}' if ral is None else ral
         
         message += f'{i + 1}. <a href="{job.link}">{job.position}</a> - {info}\n'
 
