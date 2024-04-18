@@ -1,5 +1,6 @@
 from collections import OrderedDict
 from dotenv import dotenv_values
+from handlers.chat_join.chat_join import chat_join, chat_join_callback
 from handlers.command.staff import staff
 from handlers.command.get_user_role import get_user_role
 from handlers.chat_member.chat_member import on_chat_member_update
@@ -8,6 +9,7 @@ from handlers.command.events import events
 from handlers.command.cmds import cmds
 from handlers.command.faq import faq
 from handlers.command.contacts import contacts
+from handlers.command.memo import memo
 from handlers.command.rules import rules
 from handlers.command.slides import slides
 from handlers.command.set_user_role import set_user_role
@@ -19,6 +21,8 @@ from handlers.error.error_handler import error_handler
 from handlers.message.admin import admin
 from telegram import Update
 from telegram.ext import (ApplicationBuilder, 
+                          CallbackQueryHandler,
+                          ChatJoinRequestHandler,
                           CommandHandler, 
                           ConversationHandler, 
                           filters, 
@@ -63,6 +67,13 @@ if __name__ == '__main__':
                                             filters.ChatType.GROUPS), 
                                    callback=admin)
     application.add_handler(admin_handler)
+
+    # Decomment to use this feature
+    # chat_join_request_handler = ChatJoinRequestHandler(callback=chat_join)
+    # application.add_handler(chat_join_request_handler)
+
+    chat_join_request_query_handler = CallbackQueryHandler(callback=chat_join_callback)
+    application.add_handler(chat_join_request_query_handler)
     
     cmds_handler = CommandHandler(command='cmds', 
                                   callback=cmds)
@@ -94,6 +105,10 @@ if __name__ == '__main__':
     jobs_handler = ConversationHandler(**jobs_handler)
     application.add_handler(jobs_handler, -1)
 
+    memo_handler = CommandHandler(command='memo',
+                                  callback=memo)
+    application.add_handler(memo_handler)
+
     rules_handler = CommandHandler(command='rules', 
                                    callback=rules)
     application.add_handler(rules_handler)
@@ -112,12 +127,14 @@ if __name__ == '__main__':
     ee_handler = ConversationHandler(**easter_egg_handler)
     application.add_handler(ee_handler, -1)
 
-    # ChatMemberHandler (use chat_member_type=MY_CHAT_MEMBER to check when the user blocks/unblocks the bot)
+    # ChatMemberHandler (use chat_member_type=MY_CHAT_MEMBER to receive updates from bot 
+    # (i.e. when the user blocks/unblocks the bot), and CHAT_MEMBER to receive updates from a ChatMember
+    # The ANY_CHAT_MEMBER constant is to include both members (bot and ChatMember)
     # In this case, we update the user info everytime we receive an update through this handler
     chat_member_handler = ChatMemberHandler(callback=on_chat_member_update,
-                                            chat_member_types=ChatMemberHandler.MY_CHAT_MEMBER)
+                                            chat_member_types=ChatMemberHandler.ANY_CHAT_MEMBER)
     application.add_handler(chat_member_handler)
 
 
     # In order to use InlineKeyboard, allowed_updates=Update.ALL_TYPES must be set 
-    application.run_polling(allowed_updates=Update.ALL_TYPES)
+    application.run_polling(allowed_updates=Update.ALL_TYPES, drop_pending_updates=True)
