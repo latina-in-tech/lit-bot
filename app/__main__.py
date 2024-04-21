@@ -10,6 +10,9 @@ from handlers.command.cmds import cmds
 from handlers.command.faq import faq
 from handlers.command.contacts import contacts
 from handlers.command.memo import memo
+from handlers.command.memos import memos
+from handlers.command.memo_get import memo_get
+from handlers.command.memo_pop import memo_pop
 from handlers.command.rules import rules
 from handlers.command.slides import slides
 from handlers.command.set_user_role import set_user_role
@@ -109,6 +112,18 @@ if __name__ == '__main__':
     memo_handler = CommandHandler(command='memo',
                                   callback=memo)
     application.add_handler(memo_handler)
+
+    memos_handler = CommandHandler(command='memos',
+                                   callback=memos)
+    application.add_handler(memos_handler)
+
+    memo_get_handler = CommandHandler(command='memo_get',
+                                callback=memo_get)
+    application.add_handler(memo_get_handler)
+
+    memo_pop_handler = CommandHandler(command='memo_pop',
+                                callback=memo_pop)
+    application.add_handler(memo_pop_handler)
 
     rules_handler = CommandHandler(command='rules', 
                                    callback=rules)
