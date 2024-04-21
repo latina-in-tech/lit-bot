@@ -13,7 +13,7 @@ class Memo(Base):
     name: Mapped[str] = mapped_column(nullable=False, unique=True)
     body: Mapped[str] = mapped_column(nullable=False)
     notes: Mapped[str] = mapped_column(nullable=True)
-    original_poster: Mapped[UUID] = mapped_column(nullable=False)
+    original_poster: Mapped[int] = mapped_column(nullable=False)
     created_by: Mapped[UUID] = mapped_column(ForeignKey('users.id'), nullable=False)
     created_at: Mapped[datetime] = mapped_column(nullable=False, default=datetime.now)
     updated_at: Mapped[datetime] = mapped_column(nullable=True)
