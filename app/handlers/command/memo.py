@@ -9,11 +9,13 @@ from utils.constants import Character, ChatId, Emoji
 from utils.utils import is_user_group_administrator
 
 
-HELP_MESSAGE: str = f'{Emoji.RED_QUESTION_MARK} <b>Guida all\'utilizzo del comando /memo</b>\n' + \
-                     'Crea un nuovo memo.\n\n' + \
-                     f'{Emoji.TECHNOLOGIST} <b>Utilizzo</b>\n' + \
-                     f'{Character.CIRCLE} fornendo i vari parametri: <code>/memo [name] [body] [?notes]</code>\n' + \
-                     f'{Character.CIRCLE} rispondendo a un messaggio dell\'utente: <code>/memo [name] [?notes]</code>'
+HELP_MESSAGE: str = (f'{Emoji.RED_QUESTION_MARK} <b>Guida all\'utilizzo del comando /memo</b>\n'
+                     'Crea un nuovo memo.\n\n'
+                     f'{Emoji.TECHNOLOGIST} <b>Utilizzo</b>\n'
+                     f'{Character.CIRCLE} fornendo i vari parametri:\n'
+                     '<code>/memo [name] [body] [?notes]</code>\n'
+                     f'{Character.CIRCLE} rispondendo a un messaggio dell\'utente:\n'
+                      '<code>/memo [name] [?notes]</code>')
 
 MEMO_PATTERN_WITHOUT_BODY: str = r'''^"(?P<memo_name>[^"]+)".*?
                                        (?:"(?P<memo_notes>[^"]+)")?$'''
