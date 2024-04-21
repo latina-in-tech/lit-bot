@@ -86,6 +86,7 @@ class Emoji(StrEnum):
     CONSTRUCTION_WORKER: str = '\U0001F477'
     CROSS_MARK: str = '\U0000274C'
     EIGHT_O_CLOCK: str = '\U0001F557'
+    DOWN_ARROW: str = '\U00002B07'
     ENRAGED_FACE: str = '\U0001F621'
     EURO_BANKNOTE: str = '\U0001F4B6'
     FACE_WITH_TEARS_OF_JOY: str = '\U0001F602'
