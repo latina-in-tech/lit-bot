@@ -1,6 +1,7 @@
 from models.memo.crud.create import create_memo
 from models.user.crud.create import save_user_info
 from models.user.crud.retrieve import retrieve_user_by_telegram_id
+from re import findall, RegexFlag
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ParseMode
@@ -12,7 +13,14 @@ HELP_MESSAGE: str = f'{Emoji.RED_QUESTION_MARK} <b>Guida all\'utilizzo del coman
                      'Crea un nuovo memo.\n\n' + \
                      f'{Emoji.TECHNOLOGIST} <b>Utilizzo</b>\n' + \
                      f'{Character.CIRCLE} fornendo i vari parametri: <code>/memo [name] [body] [?notes]</code>\n' + \
-                     f'{Character.CIRCLE} rispondendo a un messaggio dell\'utente: <code>/memo [name] [?notes]</code>' 
+                     f'{Character.CIRCLE} rispondendo a un messaggio dell\'utente: <code>/memo [name] [?notes]</code>'
+
+MEMO_PATTERN_WITHOUT_BODY: str = r'''^"(?P<memo_name>[^"]+)".*?
+                                       (?:"(?P<memo_notes>[^"]+)")?$'''
+
+MEMO_PATTERN_WITH_BODY: str = r'''^"(?P<memo_name>[^"]+)".*?
+                                   "(?P<memo_body>[^"]+)".*?
+                                    (?:"(?P<memo_notes>[^"]+)")?$'''
 
 
 async def memo(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -36,10 +44,11 @@ async def memo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     # Variables initialization
     user_telegram_id: int = update.message.from_user.id
-    command_args: list = context.args
-    command_args_count: int = len(command_args)
+    user_message_text: str = update.message.text.replace(f'/{memo.__name__} ', '')
     memo_data: dict = {}
     message: str = ''
+
+    print(user_message_text)
 
     # Check if the user exists in the db
     if (user := await retrieve_user_by_telegram_id(user_telegram_id)):
@@ -57,25 +66,39 @@ async def memo(update: Update, context: ContextTypes.DEFAULT_TYPE):
             # Save the body of the memo
             memo_data['body'] = message_replied.text
 
-            # If the number of arguments is between one and two (required parameters)
-            if command_args_count >= 1 and command_args_count <= 2:
+            # Check if the pattern of the command is matched, and get the matches
+            if(matches := findall(pattern=MEMO_PATTERN_WITHOUT_BODY, 
+                                  string=user_message_text, 
+                                  flags=RegexFlag.DOTALL | RegexFlag.X)):
+                
+                # Matches is a list containing a tuple of matches,
+                # so we take the first item in the list,
+                # where the tuple of matches is present
+                matches = matches[0]
 
                 # Store the record information in the dictionary
-                memo_data['name'] = command_args[0]
-                memo_data['notes'] = command_args[1] if command_args_count == 2 else None
-                memo_data['original_poster'] = original_poster_user.id
+                memo_data['name'] = matches[0]
+                memo_data['notes'] = matches[1] if len(matches) == 2 else None
+                memo_data['original_poster'] = original_poster_user.telegram_id
 
             else:
                 await update.message.reply_text(text=f'{Emoji.WARNING} Parametri del comando non corretti.')
                 return
         
         # Else, two to three arguments are expected (name, body and optional notes)
-        elif command_args_count >= 2 and command_args_count <= 3:
+        elif(matches := findall(pattern=MEMO_PATTERN_WITH_BODY, 
+                                string=user_message_text, 
+                                flags=RegexFlag.DOTALL | RegexFlag.X)):
                 
-                # Store the record information in the dictionary
-                memo_data['name'], memo_data['body'] = command_args[:2]
-                memo_data['notes'] = command_args[2] if command_args_count == 3 else None
-                memo_data['original_poster'] = user.id
+            # Matches is a list containing a tuple of matches,
+            # so we take the first item in the list,
+            # where the tuple of matches is present
+            matches = matches[0]
+            
+            # Store the record information in the dictionary
+            memo_data['name'], memo_data['body'] = matches[:2]
+            memo_data['notes'] = matches[2] if len(matches) == 3 else None
+            memo_data['original_poster'] = user.telegram_id
         else:
             await update.message.reply_text(text=f'{Emoji.WARNING} Parametri del comando non corretti.')
             return
@@ -87,10 +110,10 @@ async def memo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     memo_data['created_by'] = user.id
     
     # Create the memo
-    memo = await create_memo(memo_data=memo_data)
+    db_memo = await create_memo(memo_data=memo_data)
 
     # If the memo has been correctly created
-    if memo:
+    if db_memo:
     
         message = f'Memo creato correttamente {Emoji.CHECK_MARK_BUTTON}'
             
