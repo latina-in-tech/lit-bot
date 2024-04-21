@@ -4,11 +4,13 @@ from random import choices, shuffle
 from string import ascii_letters
 from telegram import Update
 from telegram.ext import ContextTypes
-from utils.constants import Emoji
+from utils.constants import ChatId, Emoji
 from utils.utils import create_inline_keyboard
 
 
 async def chat_join(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    WAIT_TIME_BEFORE_NEXT_REQUEST: int = 5
 
     # Get the user id of the user who is trying to join
     user_id: int = update.chat_join_request.from_user.id
@@ -26,7 +28,7 @@ async def chat_join(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if captcha_job is None:
         
         # Set the run time of the job
-        timer_expiration: datetime = (datetime.now() + timedelta(minutes=1)).astimezone(timezone.utc)
+        timer_expiration: datetime = (datetime.now() + timedelta(minutes=5)).astimezone(timezone.utc)
     
         # Job creation
         context.job_queue.run_once(callback=on_timer_expiration,
@@ -37,7 +39,8 @@ async def chat_join(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         # Inform the user to wait the timer to expire
         await context.bot.send_message(chat_id=user_chat_id,
-                                       text=f'{Emoji.ONE_O_CLOCK} Devi attendere tre minuti tra una richiesta di ingresso e l\'altra.')
+                                       text=(f'{Emoji.ONE_O_CLOCK} Devi attendere {WAIT_TIME_BEFORE_NEXT_REQUEST} minuti'
+                                             'tra una richiesta di ingresso e l\'altra.'))
         
         return
 
@@ -92,7 +95,7 @@ async def chat_join(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Send the captcha
     await context.bot.send_photo(chat_id=user_chat_id, 
                                  photo=data, 
-                                 caption=f'{Emoji.LOCKED_WITH_KEY} Premi sul CAPTCHA corretto per proseguire:',
+                                 caption=f'{Emoji.DOWN_ARROW} Premi sul codice CAPTCHA corretto per proseguire {Emoji.DOWN_ARROW}',
                                  reply_markup=captcha_keyboard)
         
 
@@ -119,13 +122,13 @@ async def chat_join_callback(update: Update, context: ContextTypes.DEFAULT_TYPE)
     # If the data from request is the same from the response, then approve the chat join request
     if request_user_id == response_user_id and request_captcha == response_captcha:
         
-        await context.bot.approve_chat_join_request(chat_id=-1002052131071, user_id=request_user_id)
+        await context.bot.approve_chat_join_request(chat_id=ChatId.GENERAL, user_id=request_user_id)
         
         # Schedule the removal of the job from the queue (if it exists)
         jobs[0].schedule_removal() if(jobs := context.job_queue.get_jobs_by_name(name=job_name)) else None
 
     else:
-        # await context.bot.decline_chat_join_request(chat_id=-1002052131071, user_id=request_user_id)
+        await context.bot.decline_chat_join_request(chat_id=ChatId.GENERAL, user_id=request_user_id)
         await update.effective_chat.send_message(f'{Emoji.CROSS_MARK} Captcha fallito!')
         
     # Delete the captcha in any case
